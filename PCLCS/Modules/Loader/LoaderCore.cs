@@ -113,6 +113,16 @@ public static class PclUiBridge {
     public static Func<McComponents, string, string, List<LoaderBase>> McInstallLoadersGet;
     /// <summary>对应 ModDownloadLib.McInstallState(Loader)。</summary>
     public static Action<LoaderBase> McInstallState;
+    /// <summary>对应 ModWatcher.WatcherStateChanged()。</summary>
+    public static Action WatcherStateChanged;
+    /// <summary>对应 ModWatcher.McWatcherList（读）。</summary>
+    public static Func<IEnumerable<Watcher>> McWatcherListGet;
+    /// <summary>对应 ModWatcher.McWatcherList（写）。</summary>
+    public static Action<IEnumerable<Watcher>> McWatcherListSet;
+    /// <summary>对应 ModMusic.MusicResume()。</summary>
+    public static Func<bool> MusicResume;
+    /// <summary>对应 ModMusic.MusicPause()。</summary>
+    public static Func<bool> MusicPause;
 }
 
 /// <summary>

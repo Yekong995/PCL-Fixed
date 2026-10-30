@@ -222,6 +222,21 @@ Public Module ModBase
         If PclUiBridge.McInstallState Is Nothing Then
             PclUiBridge.McInstallState = Sub(Loader As LoaderBase) ModDownloadLib.McInstallState(Loader)
         End If
+        If PclUiBridge.WatcherStateChanged Is Nothing Then
+            PclUiBridge.WatcherStateChanged = Sub() WatcherStateChanged()
+        End If
+        If PclUiBridge.McWatcherListGet Is Nothing Then
+            PclUiBridge.McWatcherListGet = Function() McWatcherList
+        End If
+        If PclUiBridge.McWatcherListSet Is Nothing Then
+            PclUiBridge.McWatcherListSet = Sub(List As IEnumerable(Of Watcher)) McWatcherList = List.ToList()
+        End If
+        If PclUiBridge.MusicResume Is Nothing Then
+            PclUiBridge.MusicResume = Function() MusicResume()
+        End If
+        If PclUiBridge.MusicPause Is Nothing Then
+            PclUiBridge.MusicPause = Function() MusicPause()
+        End If
         Return True
     End Function
     ''' <summary>
