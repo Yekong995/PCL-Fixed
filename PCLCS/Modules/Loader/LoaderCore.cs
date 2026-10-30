@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using MeloongCore;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace PCLCS.Modules;
 
@@ -607,7 +608,8 @@ public class LoaderTask<TIn, TOut> : LoaderBase, ILoaderTaskRestartable {
     }
     public override void Start(object Input = null, bool IsForceRestart = false) {
         // 模拟 VB 中 Object 参数经 ByRef TIn 往返的语义
-        TIn TypedInput = Input is null ? default : (TIn)Input;
+        // 模拟 VB 中 Object 参数经 ByRef TIn 往返的语义；VB 的运行时转换（如 Integer 0 → String "0"）用 Conversions.ChangeType
+        TIn TypedInput = Input is null ? default : (TIn)Conversions.ChangeType(Input, typeof(TIn));
         // 确认是否开始加载
         if (ShouldStart(ref TypedInput, IsForceRestart)) {
             // 输入不同或失败，开始加载
@@ -690,7 +692,7 @@ public class LoaderTask<TIn, TOut> : LoaderBase, ILoaderTaskRestartable {
 
     // ILoaderTaskRestartable：供 LoaderCombo 非泛型调用（VB 原经 CType(Loader, Object).ShouldStart 后期绑定）
     bool ILoaderTaskRestartable.ShouldRestartWithInput(object Input, bool IsForceRestart, bool IgnoreReloadTimeout) {
-        TIn typed = Input is null ? default : (TIn)Input;
+        TIn typed = Input is null ? default : (TIn)Conversions.ChangeType(Input, typeof(TIn));
         return ShouldStart(ref typed, IsForceRestart, IgnoreReloadTimeout);
     }
     object ILoaderTaskRestartable.GetOutput() {
@@ -812,7 +814,7 @@ public class LoaderCombo<InputType> : LoaderBase {
             }
         }
         // 启动加载
-        this.Input = Input is null ? default : (InputType)Input;
+        this.Input = Input is null ? default : (InputType)Conversions.ChangeType(Input, typeof(InputType));
         if (IsForceRestart) {
             foreach (LoaderBase Loader in Loaders) {
                 Loader.State = LoadState.Waiting;
