@@ -63,6 +63,34 @@ public static class PclUiBridge {
     public static Action<object> SwitchToInstanceSetup;
     /// <summary>对应 ModJava.MigrateInstanceJavaSettings（迁移版本独立 Java 设置，操作 VB UI）。</summary>
     public static Action<object, System.Threading.CancellationToken, ProgressProvider> MigrateInstanceJavaSettings;
+    /// <summary>对应 ModMinecraft.McInstanceSelected（读）。</summary>
+    public static Func<McInstance> McInstanceSelectedGet;
+    /// <summary>对应 ModLaunch.McLaunchLog(Text, Level)。</summary>
+    public static Action<string, LogLevel> McLaunchLog;
+    /// <summary>对应 ModMinecraft.McSkinSex(Uuid)。</summary>
+    public static Func<string, string> McSkinSex;
+    /// <summary>对应 ModMinecraft.McJsonRuleCheck(RuleToken)。</summary>
+    public static Func<Newtonsoft.Json.Linq.JToken, bool> McJsonRuleCheck;
+    /// <summary>对应 ModMinecraft.McLibListGet(Instance, IncludeMainJar)。返回 IEnumerable(Of Object) 以桥接 VB 的 McLibEntry 类型，C# 侧以 dynamic 访问。</summary>
+    public static Func<McInstance, bool, IEnumerable<object>> McLibListGet;
+    /// <summary>对应 ModMinecraft.McAssetsGetIndexName(Instance)。</summary>
+    public static Func<McInstance, string> McAssetsGetIndexName;
+    /// <summary>对应 ModMain.ArgumentReplace(Text)（单参数形式）。</summary>
+    public static Func<string, string> ArgumentReplace;
+    /// <summary>对应 ModBase.ModeDebug（读）。</summary>
+    public static Func<bool> ModeDebugGet;
+    /// <summary>对应 ModBase.VersionCode。</summary>
+    public static Func<int> VersionCodeGet;
+    /// <summary>对应 ModBase.DPI。</summary>
+    public static Func<int> DpiGet;
+    /// <summary>对应 PageInstanceSetup.GetRam(Instance)。</summary>
+    public static Func<McInstance, double> GetRam;
+    /// <summary>对应 ModLaunch.McLoginLoader.Output（读）。</summary>
+    public static Func<McLoginResult> McLoginLoaderOutputGet;
+    /// <summary>对应 ModLaunch.McLoginRequestLogin(Data)。</summary>
+    public static Func<LoaderTask<McLoginServer, McLoginResult>, bool> McLoginRequestLogin;
+    /// <summary>对应 FrmMain.PanForm 的实际像素尺寸（经 GetPixelSize 换算）。</summary>
+    public static Func<System.Windows.Size> LauncherWindowSize;
 }
 
 /// <summary>

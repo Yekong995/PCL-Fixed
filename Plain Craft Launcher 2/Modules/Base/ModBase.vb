@@ -147,6 +147,48 @@ Public Module ModBase
         If PclUiBridge.MigrateInstanceJavaSettings Is Nothing Then
             PclUiBridge.MigrateInstanceJavaSettings = Sub(Instance As Object, c As CancellationToken, p As ProgressProvider) MigrateInstanceJavaSettings(DirectCast(Instance, McInstance), c, p)
         End If
+        If PclUiBridge.McInstanceSelectedGet Is Nothing Then
+            PclUiBridge.McInstanceSelectedGet = Function() McInstanceSelected
+        End If
+        If PclUiBridge.McLaunchLog Is Nothing Then
+            PclUiBridge.McLaunchLog = Sub(Text As String, Level As LogLevel) McLaunchLog(Text, Level)
+        End If
+        If PclUiBridge.McSkinSex Is Nothing Then
+            PclUiBridge.McSkinSex = Function(Uuid As String) McSkinSex(Uuid)
+        End If
+        If PclUiBridge.McJsonRuleCheck Is Nothing Then
+            PclUiBridge.McJsonRuleCheck = Function(RuleToken As JToken) McJsonRuleCheck(RuleToken)
+        End If
+        If PclUiBridge.McLibListGet Is Nothing Then
+            PclUiBridge.McLibListGet = Function(Instance As McInstance, IncludeMainJar As Boolean) CType(McLibListGet(Instance, IncludeMainJar), IEnumerable(Of Object))
+        End If
+        If PclUiBridge.McAssetsGetIndexName Is Nothing Then
+            PclUiBridge.McAssetsGetIndexName = Function(Instance As McInstance) McAssetsGetIndexName(Instance)
+        End If
+        If PclUiBridge.ArgumentReplace Is Nothing Then
+            PclUiBridge.ArgumentReplace = Function(Text As String) ArgumentReplace(Text)
+        End If
+        If PclUiBridge.ModeDebugGet Is Nothing Then
+            PclUiBridge.ModeDebugGet = Function() ModeDebug
+        End If
+        If PclUiBridge.VersionCodeGet Is Nothing Then
+            PclUiBridge.VersionCodeGet = Function() VersionCode
+        End If
+        If PclUiBridge.DpiGet Is Nothing Then
+            PclUiBridge.DpiGet = Function() DPI
+        End If
+        If PclUiBridge.GetRam Is Nothing Then
+            PclUiBridge.GetRam = Function(Instance As McInstance) PageInstanceSetup.GetRam(Instance)
+        End If
+        If PclUiBridge.McLoginLoaderOutputGet Is Nothing Then
+            PclUiBridge.McLoginLoaderOutputGet = Function() McLoginLoader.Output
+        End If
+        If PclUiBridge.McLoginRequestLogin Is Nothing Then
+            PclUiBridge.McLoginRequestLogin = Function(Data As LoaderTask(Of McLoginServer, McLoginResult)) McLoginRequestLogin(Data)
+        End If
+        If PclUiBridge.LauncherWindowSize Is Nothing Then
+            PclUiBridge.LauncherWindowSize = Function() New Size(GetPixelSize(FrmMain.PanForm.ActualWidth), GetPixelSize(FrmMain.PanForm.ActualHeight))
+        End If
         Return True
     End Function
     ''' <summary>
