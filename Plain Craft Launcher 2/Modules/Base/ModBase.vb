@@ -89,6 +89,18 @@ Public Module ModBase
         If PclNet.RawRequestProvider Is Nothing Then
             PclNet.RawRequestProvider = Function(Url As String, Method As HttpMethod, Content As Object, ContentType As String, Timeout As Integer, Encode As Encoding, RequireJson As Boolean) NetRequestByClient(Url, Method, Content, ContentType, "*/*", Timeout, Nothing, RequireJson, Encode, False, True)
         End If
+        If PclUiBridge.SecretCdnSign Is Nothing Then
+            PclUiBridge.SecretCdnSign = Function(Url As String) SecretCdnSign(Url)
+        End If
+        If PclUiBridge.SecretHeadersSign Is Nothing Then
+            PclUiBridge.SecretHeadersSign = Sub(Url As String, Req As HttpRequestMessage, Simulate As Boolean) SecretHeadersSign(Url, Req, Simulate)
+        End If
+        If PclUiBridge.McFolderListProvider Is Nothing Then
+            PclUiBridge.McFolderListProvider = Function() McFolderList.Select(Function(f) f.Location)
+        End If
+        If PclUiBridge.LoaderTaskbar Is Nothing Then
+            PclUiBridge.LoaderTaskbar = Function() LoaderTaskbar.ToList
+        End If
         Return True
     End Function
     ''' <summary>

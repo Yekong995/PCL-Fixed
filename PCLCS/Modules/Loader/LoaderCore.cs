@@ -37,10 +37,18 @@ public static class PclUiBridge {
     public static Func<string, char, string> FilterAccessToken;
     /// <summary>对应 McInstance.VersionDisplayName（参数为 McInstance 对象，可为 null）。</summary>
     public static Func<object, string> GetInstanceDisplayName;
+    /// <summary>对应 ModSecret.SecretCdnSign(UrlWithMark)。</summary>
+    public static Func<string, string> SecretCdnSign;
+    /// <summary>对应 ModSecret.SecretHeadersSign(Url, Req, SimulateBrowserHeaders)。</summary>
+    public static Action<string, System.Net.Http.HttpRequestMessage, bool> SecretHeadersSign;
+    /// <summary>对应 McFolderList.Select(Function(f) f.Location)。</summary>
+    public static Func<IEnumerable<string>> McFolderListProvider;
+    /// <summary>对应 ModLoader.LoaderTaskbar.ToList()。</summary>
+    public static Func<List<LoaderBase>> LoaderTaskbar;
 }
 
 /// <summary>
-/// 兼容旧 Loader 的下载加载器接口，由 VB 侧 LoaderDownload 实现，用于打破语言间循环引用。
+/// 兼容旧 Loader 的下载加载器接口，由 LoaderDownload（已迁移至 C#，PCLCS.Modules.Net.NetCore.cs）实现。
 /// </summary>
 public interface IDownloadLoader {
     void StartDownload(object Input, bool IsForceRestart);

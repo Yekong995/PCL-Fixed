@@ -72,6 +72,15 @@
 	  <Reference Include="Imazen.WebP">
 	    <HintPath>..\Plain Craft Launcher 2\Resources\Imazen.WebP.dll</HintPath>
 	  </Reference>
+	  <Reference Include="CacheCow.Client">
+	    <HintPath>..\Plain Craft Launcher 2\Resources\CacheCow.Client.dll</HintPath>
+	  </Reference>
+	  <Reference Include="CacheCow.Client.FileStore">
+	    <HintPath>..\Plain Craft Launcher 2\Resources\CacheCow.Client.FileStore.dll</HintPath>
+	  </Reference>
+	  <Reference Include="CacheCow.Common">
+	    <HintPath>..\Plain Craft Launcher 2\Resources\CacheCow.Common.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>
