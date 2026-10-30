@@ -520,13 +520,23 @@ public static class PclLaunch {
             Logger.Error(ex, "选择 Java 时出现异常（McLaunchJava 兜底）", LogBehavior.Toast);
             throw;
         }
+        Dbj($"McLaunchJava：SelectOrDownloadJava 返回 {(McLaunchJavaSelected is null ? "null" : McLaunchJavaSelected.ToString())}");
         if (Task.IsCanceled) return;
         if (McLaunchJavaSelected is null) throw new OperationCanceledException(); // SelectOrDownloadJava 已经会给予适当的提示
         if (PclUiBridge.ModeDebugGet()) {
             McLaunchLog($"预期 Java 版本范围：{PclJava.GetJavaRequirement(PclUiBridge.McInstanceSelectedGet()).Range}");
             McLaunchLog($"Java 版本设置类别：{PclCore.GetSetting<int>("VersionArgumentJavaV2", PclUiBridge.McInstanceSelectedGet())}");
         }
+        Dbj("McLaunchJava：调用 McLaunchLog 前");
         McLaunchLog("选择的 Java：" + McLaunchJavaSelected.ToString());
+        Dbj("McLaunchJava：调用 McLaunchLog 后");
+    }
+
+    private static void Dbj(string message) {
+        try {
+            System.IO.File.AppendAllText(Paths.Base + "dbg_java.txt", $"{DateTime.Now:HH:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId}] {message}\r\n");
+        } catch {
+        }
     }
 
     #endregion
