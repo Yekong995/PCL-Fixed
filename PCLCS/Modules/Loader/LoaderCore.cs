@@ -123,6 +123,50 @@ public static class PclUiBridge {
     public static Func<bool> MusicResume;
     /// <summary>对应 ModMusic.MusicPause()。</summary>
     public static Func<bool> MusicPause;
+    /// <summary>对应 ModSecret.ThemeRefreshMain()（主题刷新后的主界面 UI 更新）。</summary>
+    public static Action ThemeRefreshMain;
+    /// <summary>对应 ModBase.VersionBaseName，用于 C# 侧生成网络请求 UA。</summary>
+    public static Func<string> VersionBaseNameGet;
+    /// <summary>对应 CInt(ModBase.BuildType)，用于 C# 侧生成网络请求 UA。</summary>
+    public static Func<int> BuildTypeNumberGet;
+    /// <summary>对应 PageOtherHelp.EnterHelpPage(Location)。</summary>
+    public static Action<string> EnterHelpPage;
+    /// <summary>对应 FrmLaunchRight.ForceRefresh()。</summary>
+    public static Action ForceRefreshLaunchRight;
+    /// <summary>对应 FrmMain.PageRight Is IRefreshable 时的刷新，返回是否刷新成功。</summary>
+    public static Func<bool> RefreshPageRight;
+    /// <summary>对应 ModBase.ClipboardSet(Text)。</summary>
+    public static Action<string> ClipboardSet;
+    /// <summary>对应 ModBase.OpenWebsite(Url)。</summary>
+    public static Action<string> OpenWebsite;
+    /// <summary>对应 PageOtherLeft.RefreshHelp()。</summary>
+    public static Action RefreshHelp;
+    /// <summary>对应 ModMain.HelpTryExtract()。</summary>
+    public static Action HelpTryExtract;
+    /// <summary>对应 PageOtherTest.Jrrp()。</summary>
+    public static Action Jrrp;
+    /// <summary>对应 PageOtherTest.MemoryOptimize(True)。</summary>
+    public static Action MemoryOptimize;
+    /// <summary>对应 PageOtherTest.RubbishClear()。</summary>
+    public static Action RubbishClear;
+    /// <summary>对应 PageOtherTest.StartCustomDownload(Url, FileName, Folder)。</summary>
+    public static Action<string, string, string> StartCustomDownload;
+    /// <summary>对应 ModModpack.ModpackInstall()。</summary>
+    public static Action ModpackInstall;
+    /// <summary>对应 ModLaunch.McLaunchStart(Options)。</summary>
+    public static Func<McLaunchOptions, bool> McLaunchStart;
+    /// <summary>对应 PageLinkMain.Join() 与 Join(Code)，参数为 null 时调用无参版本。</summary>
+    public static Action<string> PageLinkJoin;
+    /// <summary>对应 FrmMain.PageChange（切换页面事件），参数为（页面类型名, 子页面类型名或 null）。</summary>
+    public static Action<string, string> PageChangeByEvent;
+    /// <summary>对应 Settings.SetSafe(Key, Value, Instance)。</summary>
+    public static Action<string, object, object> SettingSetSafe;
+    /// <summary>对应 FrmMain.BtnExtraMusic.Show/Logo/LogoScale/ToolTip。参数为（是否显示, 图标名 Play/Music, LogoScale, ToolTip）。</summary>
+    public static Action<bool, string, double, string> UpdateMusicButton;
+    /// <summary>对应 FrmMain.BtnExtraMusic.Progress。参数为播放进度（0-1）。</summary>
+    public static Action<double> UpdateMusicButtonProgress;
+    /// <summary>对应 FrmSetupUI.MusicRefreshUI()。</summary>
+    public static Action MusicRefreshSetupUi;
 }
 
 /// <summary>

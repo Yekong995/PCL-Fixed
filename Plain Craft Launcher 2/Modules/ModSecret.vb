@@ -1,110 +1,267 @@
-'由于包含加解密等安全信息，本文件中的部分代码已被删除
+'由于包含加解密等安全信息，本文件的部分代码已被删除。
+'CurseForge API Key 与微软登录 ClientID 的注入入口已迁移至 PCLCS\Modules\ModSecret.cs，
+'通过环境变量 PCL_CURSEFORGE_API_KEY 与 PCL_MS_CLIENT_ID 提供。
+'其余成员保留为同名转发壳，具体实现位于 PCLCS\Modules\ModSecret.cs。
 
 Friend Module ModSecret
 
     '标注 PCL 的不同分支，仅用于替换标记
-    Public Const VersionBranchMain As String = "OpenSource"
+    Public ReadOnly Property VersionBranchMain As String
+        Get
+            Return PCLCS.Modules.ModSecret.VersionBranchMain
+        End Get
+    End Property
     '在开源版的注册表与常规版的注册表隔离，以防数据冲突
-    Public Const RegFolder As String = "PCLDebug"
+    Public ReadOnly Property RegFolder As String
+        Get
+            Return PCLCS.Modules.ModSecret.RegFolder
+        End Get
+    End Property
     '用于微软登录的 ClientId
-    Public OAuthClientId As String = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), "")
+    Public Property OAuthClientId As String
+        Get
+            Return PCLCS.Modules.ModSecret.OAuthClientId
+        End Get
+        Set(value As String)
+            PCLCS.Modules.ModSecret.OAuthClientId = value
+        End Set
+    End Property
     'CurseForge API Key
-    Public CurseForgeAPIKey As String = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), "")
+    Public Property CurseForgeAPIKey As String
+        Get
+            Return PCLCS.Modules.ModSecret.CurseForgeAPIKey
+        End Get
+        Set(value As String)
+            PCLCS.Modules.ModSecret.CurseForgeAPIKey = value
+        End Set
+    End Property
     '用于匿名数据收集的腾讯云日志服务上报 URL，形如 https://{region}.cls.tencentcs.com/track?topic_id={topic_id}
-    Public Const ClsBaseUrl As String = ""
+    Public ReadOnly Property ClsBaseUrl As String
+        Get
+            Return PCLCS.Modules.ModSecret.ClsBaseUrl
+        End Get
+    End Property
 
 #Region "网络鉴权"
 
     Friend Function SecretCdnSign(UrlWithMark As String) As String
-        If Not UrlWithMark.EndsWithF("{CDN}") Then Return UrlWithMark
-        Return UrlWithMark.Replace("{CDN}", "").Replace(" ", "%20")
+        Return PCLCS.Modules.ModSecret.SecretCdnSign(UrlWithMark)
     End Function
     ''' <summary>
     ''' 设置 Headers 的 UA、Referer。
     ''' </summary>
     Friend Sub SecretHeadersSign(Url As String, ByRef Req As HttpRequestMessage, Optional SimulateBrowserHeaders As Boolean = False)
-        If Not Req.Headers.UserAgent.Any Then
-            If Url.Contains("baidupcs.com") OrElse Url.Contains("baidu.com") Then
-                Req.Headers.Add("User-Agent", "LogStatistic")  '#4951
-            ElseIf SimulateBrowserHeaders Then
-                Req.Headers.Add("User-Agent", $"PCL2/{VersionBaseName}.{CInt(BuildType)} Mozilla/5.0 AppleWebKit/537.36 Chrome/63.0.3239.132 Safari/537.36")
-            Else
-                Req.Headers.Add("User-Agent", $"PCL2/{VersionBaseName}.{CInt(BuildType)}")
-            End If
-        End If
-        If Not SimulateBrowserHeaders Then Req.Headers.Add("Referer", $"http://{VersionCode}.open.pcl2.server/")
-        If Url.Contains("api.curseforge.com") OrElse Url.Contains("forgecdn.net") Then Req.Headers.Add("x-api-key", CurseForgeAPIKey)
+        PCLCS.Modules.ModSecret.SecretHeadersSign(Url, Req, SimulateBrowserHeaders)
     End Sub
 
 #End Region
 
 #Region "主题"
 
-    Public Color1 As New MyColor(52, 61, 74)
-    Public Color2 As New MyColor(11, 91, 203)
-    Public Color3 As New MyColor(19, 112, 243)
-    Public Color4 As New MyColor(72, 144, 245)
-    Public Color5 As New MyColor(150, 192, 249)
-    Public Color6 As New MyColor(213, 230, 253)
-    Public Color7 As New MyColor(222, 236, 253)
-    Public Color8 As New MyColor(234, 242, 254)
-    Public ColorBg0 As New MyColor(150, 192, 249)
-    Public ColorBg1 As New MyColor(190, Color7)
-    Public ColorGray1 As New MyColor(64, 64, 64)
-    Public ColorGray2 As New MyColor(115, 115, 115)
-    Public ColorGray3 As New MyColor(140, 140, 140)
-    Public ColorGray4 As New MyColor(166, 166, 166)
-    Public ColorGray5 As New MyColor(204, 204, 204)
-    Public ColorGray6 As New MyColor(235, 235, 235)
-    Public ColorGray7 As New MyColor(240, 240, 240)
-    Public ColorGray8 As New MyColor(245, 245, 245)
-    Public ColorSemiTransparent As New MyColor(1, Color8)
+    Public Property Color1 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color1
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color1 = value
+        End Set
+    End Property
+    Public Property Color2 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color2
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color2 = value
+        End Set
+    End Property
+    Public Property Color3 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color3
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color3 = value
+        End Set
+    End Property
+    Public Property Color4 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color4
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color4 = value
+        End Set
+    End Property
+    Public Property Color5 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color5
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color5 = value
+        End Set
+    End Property
+    Public Property Color6 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color6
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color6 = value
+        End Set
+    End Property
+    Public Property Color7 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color7
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color7 = value
+        End Set
+    End Property
+    Public Property Color8 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.Color8
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.Color8 = value
+        End Set
+    End Property
+    Public Property ColorBg0 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorBg0
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorBg0 = value
+        End Set
+    End Property
+    Public Property ColorBg1 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorBg1
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorBg1 = value
+        End Set
+    End Property
+    Public Property ColorGray1 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray1
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray1 = value
+        End Set
+    End Property
+    Public Property ColorGray2 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray2
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray2 = value
+        End Set
+    End Property
+    Public Property ColorGray3 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray3
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray3 = value
+        End Set
+    End Property
+    Public Property ColorGray4 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray4
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray4 = value
+        End Set
+    End Property
+    Public Property ColorGray5 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray5
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray5 = value
+        End Set
+    End Property
+    Public Property ColorGray6 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray6
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray6 = value
+        End Set
+    End Property
+    Public Property ColorGray7 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray7
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray7 = value
+        End Set
+    End Property
+    Public Property ColorGray8 As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorGray8
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorGray8 = value
+        End Set
+    End Property
+    Public Property ColorSemiTransparent As MyColor
+        Get
+            Return PCLCS.Modules.ModSecret.ColorSemiTransparent
+        End Get
+        Set(value As MyColor)
+            PCLCS.Modules.ModSecret.ColorSemiTransparent = value
+        End Set
+    End Property
 
-    Public ThemeNow As Integer = -1
-    Public ColorHue As Integer = 210, ColorSat As Integer = 85, ColorLightAdjust As Integer = 0, ColorHueTopbarDelta As OneOf(Of Integer, Integer()) = 0
-    Public ThemeDontClick As Integer = 0
+    Public Property ThemeNow As Integer
+        Get
+            Return PCLCS.Modules.ModSecret.ThemeNow
+        End Get
+        Set(value As Integer)
+            PCLCS.Modules.ModSecret.ThemeNow = value
+        End Set
+    End Property
+    Public Property ColorHue As Integer
+        Get
+            Return PCLCS.Modules.ModSecret.ColorHue
+        End Get
+        Set(value As Integer)
+            PCLCS.Modules.ModSecret.ColorHue = value
+        End Set
+    End Property
+    Public Property ColorSat As Integer
+        Get
+            Return PCLCS.Modules.ModSecret.ColorSat
+        End Get
+        Set(value As Integer)
+            PCLCS.Modules.ModSecret.ColorSat = value
+        End Set
+    End Property
+    Public Property ColorLightAdjust As Integer
+        Get
+            Return PCLCS.Modules.ModSecret.ColorLightAdjust
+        End Get
+        Set(value As Integer)
+            PCLCS.Modules.ModSecret.ColorLightAdjust = value
+        End Set
+    End Property
+    Public Property ColorHueTopbarDelta As OneOf(Of Integer, Integer())
+        Get
+            Return PCLCS.Modules.ModSecret.ColorHueTopbarDelta
+        End Get
+        Set(value As OneOf(Of Integer, Integer()))
+            PCLCS.Modules.ModSecret.ColorHueTopbarDelta = value
+        End Set
+    End Property
+    Public Property ThemeDontClick As Integer
+        Get
+            Return PCLCS.Modules.ModSecret.ThemeDontClick
+        End Get
+        Set(value As Integer)
+            PCLCS.Modules.ModSecret.ThemeDontClick = value
+        End Set
+    End Property
 
     Public Sub ThemeRefresh(Optional NewTheme As Integer = -1)
-        Try
-            If ThemeNow = NewTheme AndAlso NewTheme >= 0 Then Return
-            If NewTheme >= 0 Then ThemeNow = NewTheme
-
-            Color1 = New MyColor().FromHSL2(ColorHue, ColorSat * 0.2, 25 + ColorLightAdjust * 0.3)
-            Color2 = New MyColor().FromHSL2(ColorHue, ColorSat, 45 + ColorLightAdjust)
-            Color3 = New MyColor().FromHSL2(ColorHue, ColorSat, 55 + ColorLightAdjust)
-            Color4 = New MyColor().FromHSL2(ColorHue, ColorSat, 65 + ColorLightAdjust)
-            Color5 = New MyColor().FromHSL2(ColorHue, ColorSat, 80 + ColorLightAdjust * 0.4)
-            Color6 = New MyColor().FromHSL2(ColorHue, ColorSat, 91 + ColorLightAdjust * 0.1)
-            Color7 = New MyColor().FromHSL2(ColorHue, ColorSat, 95)
-            Color8 = New MyColor().FromHSL2(ColorHue, ColorSat, 97)
-            ColorBg0 = Color4 * 0.4 + Color5 * 0.4 + ColorGray4 * 0.2
-            ColorBg1 = New MyColor(190, Color7)
-
-            ColorSemiTransparent = New MyColor(1, Color8)
-            Application.Current.Resources("ColorBrush1") = New SolidColorBrush(Color1)
-            Application.Current.Resources("ColorBrush2") = New SolidColorBrush(Color2)
-            Application.Current.Resources("ColorBrush3") = New SolidColorBrush(Color3)
-            Application.Current.Resources("ColorBrush4") = New SolidColorBrush(Color4)
-            Application.Current.Resources("ColorBrush5") = New SolidColorBrush(Color5)
-            Application.Current.Resources("ColorBrush6") = New SolidColorBrush(Color6)
-            Application.Current.Resources("ColorBrush7") = New SolidColorBrush(Color7)
-            Application.Current.Resources("ColorBrush8") = New SolidColorBrush(Color8)
-            Application.Current.Resources("ColorBrushBg0") = New SolidColorBrush(ColorBg0)
-            Application.Current.Resources("ColorBrushBg1") = New SolidColorBrush(ColorBg1)
-            Application.Current.Resources("ColorObject1") = CType(Color1, Color)
-            Application.Current.Resources("ColorObject2") = CType(Color2, Color)
-            Application.Current.Resources("ColorObject3") = CType(Color3, Color)
-            Application.Current.Resources("ColorObject4") = CType(Color4, Color)
-            Application.Current.Resources("ColorObject5") = CType(Color5, Color)
-            Application.Current.Resources("ColorObject6") = CType(Color6, Color)
-            Application.Current.Resources("ColorObject7") = CType(Color7, Color)
-            Application.Current.Resources("ColorObject8") = CType(Color8, Color)
-            Application.Current.Resources("ColorObjectBg0") = CType(ColorBg0, Color)
-            Application.Current.Resources("ColorObjectBg1") = CType(ColorBg1, Color)
-            ThemeRefreshMain()
-        Catch ex As Exception
-            Logger.Error(ex, "刷新主题颜色失败", LogBehavior.Toast)
-        End Try
+        PCLCS.Modules.ModSecret.ThemeRefresh(NewTheme)
     End Sub
     Public Sub ThemeRefreshMain()
         RunInUi(
@@ -132,12 +289,13 @@ Friend Module ModSecret
         End Sub)
     End Sub
     Friend Sub ThemeCheckAll(EffectSetup As Boolean)
+        PCLCS.Modules.ModSecret.ThemeCheckAll(EffectSetup)
     End Sub
     Friend Function ThemeCheckOne(Id As Integer) As Boolean
-        Return True
+        Return PCLCS.Modules.ModSecret.ThemeCheckOne(Id)
     End Function
     Friend Function ThemeUnlock(Id As Integer, Optional ShowDoubleHint As Boolean = True, Optional UnlockHint As String = Nothing) As Boolean
-        Return False
+        Return PCLCS.Modules.ModSecret.ThemeUnlock(Id, ShowDoubleHint, UnlockHint)
     End Function
 
 #End Region
@@ -145,13 +303,22 @@ Friend Module ModSecret
 #Region "更新"
 
     Friend Sub UpdateCheckByButton()
-        Hint("该版本中不包含更新功能……")
+        PCLCS.Modules.ModSecret.UpdateCheckByButton()
     End Sub
 
-    Friend IsUpdateWaitingRestart As Boolean = False
+    Public Property IsUpdateWaitingRestart As Boolean
+        Get
+            Return PCLCS.Modules.ModSecret.IsUpdateWaitingRestart
+        End Get
+        Set(value As Boolean)
+            PCLCS.Modules.ModSecret.IsUpdateWaitingRestart = value
+        End Set
+    End Property
     Public Sub UpdateRestart(TriggerRestartAndByEnd As Boolean)
+        PCLCS.Modules.ModSecret.UpdateRestart(TriggerRestartAndByEnd)
     End Sub
     Public Sub UpdateReplace(ProcessId As Integer, OldFileName As String, NewFileName As String, TriggerRestart As Boolean)
+        PCLCS.Modules.ModSecret.UpdateReplace(ProcessId, OldFileName, NewFileName, TriggerRestart)
     End Sub
 
     ''' <summary>
@@ -159,7 +326,7 @@ Friend Module ModSecret
     ''' 如果不是，则下载一个。
     ''' </summary>
     Friend Sub DownloadLatestPCL(Optional LoaderToSyncProgress As LoaderBase = Nothing)
-        '注意：如果要自行实现这个功能，请换用另一个文件路径，以免与官方版本冲突
+        PCLCS.Modules.ModSecret.DownloadLatestPCL(LoaderToSyncProgress)
     End Sub
 
 #End Region
@@ -170,10 +337,23 @@ Friend Module ModSecret
     ''' 联网获取的配置信息。
     ''' 若获取失败或仍在获取中，可能为 Nothing。
     ''' </summary>
-    Public ServerConfig As JObject
+    Public Property ServerConfig As JObject
+        Get
+            Return PCLCS.Modules.ModSecret.ServerConfig
+        End Get
+        Set(value As JObject)
+            PCLCS.Modules.ModSecret.ServerConfig = value
+        End Set
+    End Property
 
-    Public ServerLoader As New LoaderTask(Of Integer, Integer)("PCL 配置更新", Sub() Logger.Info("该版本中不包含更新通知功能……"), Priority:=ThreadPriority.BelowNormal) With
-        {.ReloadTimeout = 1000 * 60 * 60} '超时 1 小时
+    Public Property ServerLoader As LoaderTask(Of Integer, Integer)
+        Get
+            Return PCLCS.Modules.ModSecret.ServerLoader
+        End Get
+        Set(value As LoaderTask(Of Integer, Integer))
+            PCLCS.Modules.ModSecret.ServerLoader = value
+        End Set
+    End Property
 
 #End Region
 
@@ -181,20 +361,22 @@ Friend Module ModSecret
 
     Public ReadOnly Property CurrentRank As DonationRank
         Get
-            Return DonationRank.None
+            Return PCLCS.Modules.ModSecret.CurrentRank
         End Get
     End Property
 
     Public Sub InputPotatoCode(IsUpdating As Boolean)
+        PCLCS.Modules.ModSecret.InputPotatoCode(IsUpdating)
     End Sub
     Friend Sub GeneratePotatoCode()
+        PCLCS.Modules.ModSecret.GeneratePotatoCode()
     End Sub
 
     ''' <summary>
     ''' 获取设备识别码。
     ''' </summary>
     Friend Function GetIdentify() As String
-        Return "0000-0000-0000-0000"
+        Return PCLCS.Modules.ModSecret.GetIdentify()
     End Function
 
 #End Region

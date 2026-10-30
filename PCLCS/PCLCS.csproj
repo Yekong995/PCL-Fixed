@@ -82,6 +82,10 @@
 	  <Reference Include="CacheCow.Common">
 	    <HintPath>..\Plain Craft Launcher 2\Resources\CacheCow.Common.dll</HintPath>
 	  </Reference>
+	  <Reference Include="NAudio">
+	    <HintPath>..\Plain Craft Launcher 2\Resources\NAudio.dll</HintPath>
+	  </Reference>
+	  <Reference Include="System.Xaml" />
 	</ItemGroup>
 
 </Project>

@@ -237,6 +237,112 @@ Public Module ModBase
         If PclUiBridge.MusicPause Is Nothing Then
             PclUiBridge.MusicPause = Function() MusicPause()
         End If
+        'ModSecret：主题刷新后的主界面 UI 更新（C# ThemeRefresh 经此桥调用 VB 侧实现）
+        If PclUiBridge.ThemeRefreshMain Is Nothing Then
+            PclUiBridge.ThemeRefreshMain = Sub() ThemeRefreshMain()
+        End If
+        'ModSecret：网络请求 UA 所需的版本信息
+        If PclUiBridge.VersionBaseNameGet Is Nothing Then
+            PclUiBridge.VersionBaseNameGet = Function() VersionBaseName
+        End If
+        If PclUiBridge.BuildTypeNumberGet Is Nothing Then
+            PclUiBridge.BuildTypeNumberGet = Function() CInt(BuildType)
+        End If
+        'ModEvent：自定义事件的 UI 依赖
+        If PclUiBridge.EnterHelpPage Is Nothing Then
+            PclUiBridge.EnterHelpPage = Sub(Location As String) PageOtherHelp.EnterHelpPage(Location)
+        End If
+        If PclUiBridge.ForceRefreshLaunchRight Is Nothing Then
+            PclUiBridge.ForceRefreshLaunchRight = Sub() FrmLaunchRight.ForceRefresh()
+        End If
+        If PclUiBridge.RefreshPageRight Is Nothing Then
+            PclUiBridge.RefreshPageRight = Function()
+                If TypeOf FrmMain.PageRight Is IRefreshable Then
+                    RunInUiWait(Sub() CType(FrmMain.PageRight, IRefreshable).Refresh())
+                    Return True
+                Else
+                    Return False
+                End If
+            End Function
+        End If
+        If PclUiBridge.ClipboardSet Is Nothing Then
+            PclUiBridge.ClipboardSet = Sub(Text As String) ClipboardSet(Text)
+        End If
+        If PclUiBridge.OpenWebsite Is Nothing Then
+            PclUiBridge.OpenWebsite = Sub(Url As String) OpenWebsite(Url)
+        End If
+        If PclUiBridge.RefreshHelp Is Nothing Then
+            PclUiBridge.RefreshHelp = Sub() PageOtherLeft.RefreshHelp()
+        End If
+        If PclUiBridge.HelpTryExtract Is Nothing Then
+            PclUiBridge.HelpTryExtract = Sub() HelpTryExtract()
+        End If
+        If PclUiBridge.Jrrp Is Nothing Then
+            PclUiBridge.Jrrp = Sub() PageOtherTest.Jrrp()
+        End If
+        If PclUiBridge.MemoryOptimize Is Nothing Then
+            PclUiBridge.MemoryOptimize = Sub() PageOtherTest.MemoryOptimize(True)
+        End If
+        If PclUiBridge.RubbishClear Is Nothing Then
+            PclUiBridge.RubbishClear = Sub() PageOtherTest.RubbishClear()
+        End If
+        If PclUiBridge.StartCustomDownload Is Nothing Then
+            PclUiBridge.StartCustomDownload = Sub(Url As String, FileName As String, Folder As String) PageOtherTest.StartCustomDownload(Url, FileName, Folder)
+        End If
+        If PclUiBridge.ModpackInstall Is Nothing Then
+            PclUiBridge.ModpackInstall = Sub() ModpackInstall()
+        End If
+        If PclUiBridge.McLaunchStart Is Nothing Then
+            PclUiBridge.McLaunchStart = Function(Options As McLaunchOptions) McLaunchStart(Options)
+        End If
+        If PclUiBridge.PageLinkJoin Is Nothing Then
+            PclUiBridge.PageLinkJoin = Sub(Code As String) If String.IsNullOrEmpty(Code) Then PageLinkMain.Join() Else PageLinkMain.Join(Code)
+        End If
+        If PclUiBridge.PageChangeByEvent Is Nothing Then
+            PclUiBridge.PageChangeByEvent = Sub(PageName As String, SubPageName As String)
+                RunInUi(
+                Sub()
+                    Dim TargetPage = EnumUtils.FromString(Of FormMain.PageType)(PageName)
+                    If TargetPage = FormMain.PageType.InstanceSetup Then
+                        If McInstanceSelected Is Nothing Then
+                            Hint("请先选择一个 Minecraft 版本！", HintType.Red)
+                            Return
+                        End If
+                        If McInstanceLock.IsLocked(McInstanceSelected) Then
+                            Hint("该版本正在被修改，暂时无法进入版本设置！", HintType.Red)
+                            Return
+                        End If
+                        PageInstanceLeft.Instance = McInstanceSelected
+                    End If
+                    FrmMain.PageChange(TargetPage,
+                        If(SubPageName = "", FormMain.PageSubType.Default, EnumUtils.FromString(Of FormMain.PageSubType)(SubPageName)))
+                End Sub)
+            End Sub
+        End If
+        If PclUiBridge.SettingSetSafe Is Nothing Then
+            PclUiBridge.SettingSetSafe = Sub(Key As String, Value As Object, Instance As Object) Settings.SetSafe(Key, Value, TryCast(Instance, McInstance))
+        End If
+        'ModMusic：音乐按钮与设置页 UI
+        If PclUiBridge.UpdateMusicButton Is Nothing Then
+            PclUiBridge.UpdateMusicButton = Sub(Show As Boolean, IconName As String, Scale As Double, Tip As String)
+                FrmMain.BtnExtraMusic.Show = Show
+                If Show Then
+                    If IconName = "Play" Then
+                        FrmMain.BtnExtraMusic.Logo = Logo.IconPlay
+                    ElseIf IconName = "Music" Then
+                        FrmMain.BtnExtraMusic.Logo = Logo.IconMusic
+                    End If
+                    FrmMain.BtnExtraMusic.LogoScale = Scale
+                    FrmMain.BtnExtraMusic.ToolTip = Tip
+                End If
+            End Sub
+        End If
+        If PclUiBridge.UpdateMusicButtonProgress Is Nothing Then
+            PclUiBridge.UpdateMusicButtonProgress = Sub(Percent As Double) FrmMain.BtnExtraMusic.Progress = Percent
+        End If
+        If PclUiBridge.MusicRefreshSetupUi Is Nothing Then
+            PclUiBridge.MusicRefreshSetupUi = Sub() FrmSetupUI?.MusicRefreshUI()
+        End If
         Return True
     End Function
     ''' <summary>
