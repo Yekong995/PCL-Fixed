@@ -204,12 +204,16 @@ public static class PclLaunch {
     /// 记录启动日志。
     /// </summary>
     public static void McLaunchLog(string Text, LogLevel Level = LogLevel.Info) {
+        Dbj("McLaunchLog 进入");
         Text = PclUiBridge.FilterUserName(PclUiBridge.FilterAccessToken(Text, '*'), '*');
+        Dbj("McLaunchLog 脱敏完成");
         if (PclUiBridge.ModeDebugGet()) {
             PclCore.RunInUi(
             () => PclUiBridge.AppendLaunchLog($"[{DateTime.Now:HH':'mm':'ss'.'fff'}] {Text}{Environment.NewLine}"));
         }
+        Dbj("McLaunchLog 调用 Logger.Log 前");
         Logger.Log(Text, Level);
+        Dbj("McLaunchLog 完成");
     }
 
     #endregion
