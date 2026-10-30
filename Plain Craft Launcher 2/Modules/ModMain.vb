@@ -6,15 +6,6 @@ Public Module ModMain
 
 #Region "弹出提示"
 
-    ''' <summary>
-    ''' 提示信息的种类。
-    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
-    ''' </summary>
-    Public Enum HintType
-        Blue
-        Green
-        Red
-    End Enum
     Private Structure HintMessage
         Public Text As String
         Public Type As HintType

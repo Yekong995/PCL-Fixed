@@ -56,6 +56,36 @@ Public Module ModBase
         If PclUiBridge.CurrentVersionInstance Is Nothing Then
             PclUiBridge.CurrentVersionInstance = Function() If(PageInstanceLeft.Instance Is Nothing, Nothing, PageInstanceLeft.Instance)
         End If
+        If PclUiBridge.ShowWindowToTop Is Nothing Then
+            PclUiBridge.ShowWindowToTop = Sub() If FrmMain IsNot Nothing Then FrmMain.ShowWindowToTop()
+        End If
+        If PclUiBridge.ShowCrashMsgBox Is Nothing Then
+            PclUiBridge.ShowCrashMsgBox = Function(Content As String, Title As String, B1 As String, B2 As String, B3 As String, B2Action As Action) MyMsgBox(Content, Title, B1, B2, B3, Button2Action:=If(B2Action Is Nothing, Nothing, Sub() B2Action()))
+        End If
+        If PclUiBridge.ShowHint Is Nothing Then
+            PclUiBridge.ShowHint = Sub(Text As String, Type As HintType) Hint(Text, Type)
+        End If
+        If PclUiBridge.IsLauncherNewest Is Nothing Then
+            PclUiBridge.IsLauncherNewest = Function() PageSetupSystem.IsLauncherNewest()
+        End If
+        If PclUiBridge.Telemetry Is Nothing Then
+            PclUiBridge.Telemetry = Sub(EventName As String, Datas As String()) Telemetry(EventName, Datas)
+        End If
+        If PclUiBridge.FeedbackInfo Is Nothing Then
+            PclUiBridge.FeedbackInfo = Sub() FeedbackInfo()
+        End If
+        If PclUiBridge.RequestTaskTempFolder Is Nothing Then
+            PclUiBridge.RequestTaskTempFolder = Function() RequestTaskTempFolder()
+        End If
+        If PclUiBridge.FilterUserName Is Nothing Then
+            PclUiBridge.FilterUserName = Function(Raw As String, FilterChar As Char) FilterUserName(Raw, FilterChar)
+        End If
+        If PclUiBridge.FilterAccessToken Is Nothing Then
+            PclUiBridge.FilterAccessToken = Function(Raw As String, FilterChar As Char) FilterAccessToken(Raw, FilterChar)
+        End If
+        If PclUiBridge.GetInstanceDisplayName Is Nothing Then
+            PclUiBridge.GetInstanceDisplayName = Function(Instance As Object) If(Instance Is Nothing, Nothing, DirectCast(Instance, McInstance).VersionDisplayName)
+        End If
         If PclNet.RawRequestProvider Is Nothing Then
             PclNet.RawRequestProvider = Function(Url As String, Method As HttpMethod, Content As Object, ContentType As String, Timeout As Integer, Encode As Encoding, RequireJson As Boolean) NetRequestByClient(Url, Method, Content, ContentType, "*/*", Timeout, Nothing, RequireJson, Encode, False, True)
         End If

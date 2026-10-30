@@ -17,6 +17,26 @@ public static class PclUiBridge {
     public static Action DownloadExtraRefresh;
     /// <summary>对应 PageInstanceLeft.Instance，用于版本独立设置项的读取。</summary>
     public static Func<object> CurrentVersionInstance;
+    /// <summary>对应 FrmMain.ShowWindowToTop()。</summary>
+    public static Action ShowWindowToTop;
+    /// <summary>对应 MyMsgBox 的多按钮弹窗。参数为（内容, 标题, 按钮1, 按钮2, 按钮3, 按钮2回调），返回按钮序号（1/2/3）。</summary>
+    public static Func<string, string, string, string, string, Action, int> ShowCrashMsgBox;
+    /// <summary>对应 Hint(Text, Type)。</summary>
+    public static Action<string, HintType> ShowHint;
+    /// <summary>对应 PageSetupSystem.IsLauncherNewest()。</summary>
+    public static Func<bool> IsLauncherNewest;
+    /// <summary>对应 Telemetry(Event, Datas())。</summary>
+    public static Action<string, string[]> Telemetry;
+    /// <summary>对应 FeedbackInfo()。</summary>
+    public static Action FeedbackInfo;
+    /// <summary>对应 RequestTaskTempFolder()。</summary>
+    public static Func<string> RequestTaskTempFolder;
+    /// <summary>对应 FilterUserName(Raw, FilterChar)。</summary>
+    public static Func<string, char, string> FilterUserName;
+    /// <summary>对应 FilterAccessToken(Raw, FilterChar)。</summary>
+    public static Func<string, char, string> FilterAccessToken;
+    /// <summary>对应 McInstance.VersionDisplayName（参数为 McInstance 对象，可为 null）。</summary>
+    public static Func<object, string> GetInstanceDisplayName;
 }
 
 /// <summary>
