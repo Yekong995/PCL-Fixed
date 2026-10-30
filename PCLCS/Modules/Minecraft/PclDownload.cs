@@ -924,6 +924,160 @@ public static class PclDownload {
 
     #endregion
 
+    #region DlClientJarGet / DlClientAssetIndexGet / DlClientFix | Minecraft 客户端 补全
+
+    /// <summary>
+    /// 返回某 Minecraft 版本对应的原版主 Jar 文件的下载信息，要求对应依赖版本已存在。
+    /// 失败则抛出异常，不需要下载则返回 Nothing。
+    /// </summary>
+    public static NetFile DlClientJarGet(McInstance Instance, bool ReturnNothingOnFileUseable) {
+        // 获取底层继承版本
+        try {
+            while (!string.IsNullOrEmpty(Instance.InheritName)) {
+                Instance = new McInstance(Instance.InheritName);
+            }
+        } catch (Exception ex) {
+            Logger.Warn(ex, "获取底层继承版本失败");
+        }
+        // 检查 Json 是否标准
+        if (Instance.JsonObject["downloads"] is null || Instance.JsonObject["downloads"]["client"] is null || Instance.JsonObject["downloads"]["client"]["url"] is null) {
+            throw new Exception("底层版本 " + Instance.Name + " 中无 jar 文件下载信息");
+        }
+        // 检查文件
+        FileChecker Checker = new FileChecker { MinSize = 1024, ActualSize = (long)(Instance.JsonObject["downloads"]["client"]["size"] ?? (JToken)(-1)), Hash = (string)Instance.JsonObject["downloads"]["client"]["sha1"] };
+        if (ReturnNothingOnFileUseable && Checker.Check(Instance.PathVersion + Instance.Name + ".jar") is null) return null; // 通过校验
+        // 返回下载信息
+        string JarUrl = (string)Instance.JsonObject["downloads"]["client"]["url"];
+        return new NetFile(DlSourceLauncherOrMetaGet(JarUrl), Instance.PathVersion + Instance.Name + ".jar", Checker);
+    }
+
+    /// <summary>
+    /// 返回某 Minecraft 版本对应的原版主 AssetIndex 文件的下载信息，要求对应依赖版本已存在。
+    /// 若未找到，则会返回 Legacy 资源文件或 Nothing。
+    /// </summary>
+    public static NetFile DlClientAssetIndexGet(McInstance Instance) {
+        // 获取底层继承版本
+        while (!string.IsNullOrEmpty(Instance.InheritName)) {
+            Instance = new McInstance(Instance.InheritName);
+        }
+        // 获取信息
+        JToken IndexInfo = PclMc.McAssetsGetIndex(Instance, true, true);
+        string IndexAddress = PclUiBridge.McFolderSelectedGet() + "assets\\indexes\\" + IndexInfo["id"].ToString() + ".json";
+        Logger.Info($"版本 {Instance.Name} 对应的资源文件索引为 {IndexInfo["id"]}");
+        string IndexUrl = IndexInfo["url"] is null ? "" : (string)IndexInfo["url"];
+        if (IndexUrl == "") {
+            return null;
+        } else {
+            return new NetFile(DlSourceLauncherOrMetaGet(IndexUrl), IndexAddress, new FileChecker { IsJson = true });
+        }
+    }
+
+    /// <summary>
+    /// 构造补全某 Minecraft 版本的所有文件的加载器列表。失败会抛出异常。
+    /// </summary>
+    public static List<LoaderBase> DlClientFix(McInstance Instance, bool CheckAssetsHash, bool DownloadAssetIndexInBackground) {
+        List<LoaderBase> Loaders = new List<LoaderBase>();
+
+        #region 下载支持库文件
+        List<LoaderBase> LoadersLib = new List<LoaderBase> {
+            new LoaderTask<string, List<NetFile>>("分析缺失支持库文件", Task => Task.Output = PclMc.McLibNetFilesFromInstance(Instance)) { ProgressWeight = 1 },
+            new LoaderDownload("下载支持库文件", new List<NetFile>()) { ProgressWeight = 15 }
+        };
+        // 构造加载器
+        Loaders.Add(new LoaderCombo<string>("下载支持库文件（主加载器）", LoadersLib) { Block = false, Show = false, ProgressWeight = 16 });
+        #endregion
+
+        #region 下载资源文件
+        if (PclMc.ShouldIgnoreFileCheck(Instance)) {
+            Logger.Warn("设置要求跳过所有 Assets 检查，文件可能不是最新的", LogBehavior.None);
+        } else {
+            List<LoaderBase> LoadersAssets = new List<LoaderBase>();
+            // 获取资源文件索引地址
+            string TempAddressMain = null;
+            string RealAddressMain = null;
+            LoadersAssets.Add(new LoaderTask<string, List<NetFile>>("分析资源文件索引地址",
+            Task => {
+                try {
+                    NetFile IndexFile = DlClientAssetIndexGet(Instance);
+                    if (IndexFile is null) {
+                        Task.Output = new List<NetFile>();
+                        Logger.Warn($"未找到版本 {Instance.Name} 的合适的资源索引下载地址，游戏 assets 可能缺失");
+                        return;
+                    }
+                    string IndexBackgroundFile = PclCore.GetPathTemp() + "Cache\\" + IndexFile.LocalName + "_background";
+                    if (FileUtils.Exists(IndexBackgroundFile) &&
+                       FileUtils.GetInfo(IndexBackgroundFile).LastWriteTime.Date > FileUtils.GetInfo(IndexFile.LocalPath).LastWriteTime.Date) {
+                        Logger.Info($"发现后台更新的资源索引缓存文件：{IndexBackgroundFile}");
+                        FileUtils.Move(IndexBackgroundFile, IndexFile.LocalPath);
+                    }
+                    if (DownloadAssetIndexInBackground) {
+                        // 允许后台更新索引
+                        if (IndexFile.Check.Check(IndexFile.LocalPath) is null) {
+                            Task.Output = new List<NetFile>();
+                        } else {
+                            Task.Output = new List<NetFile> { IndexFile };
+                        }
+                    } else {
+                        // 强制要求重新下载
+                        RealAddressMain = IndexFile.LocalPath;
+                        TempAddressMain = PclCore.GetPathTemp() + "Cache\\" + IndexFile.LocalName;
+                        IndexFile.LocalPath = TempAddressMain;
+                        Task.Output = new List<NetFile> { IndexFile };
+                    }
+                } catch (Exception ex) {
+                    throw new Exception("分析资源文件索引地址失败", ex);
+                }
+            }) { ProgressWeight = 0.5, Show = false });
+            // 下载资源文件索引
+            LoadersAssets.Add(new LoaderDownload("下载资源文件索引", new List<NetFile>()) { ProgressWeight = 2 });
+            // 获取资源文件地址
+            LoadersAssets.Add(new LoaderTask<string, List<NetFile>>("获取资源文件列表",
+            Task => {
+                if (TempAddressMain is not null) FileUtils.Move(TempAddressMain, RealAddressMain);
+                Task.Output = PclMc.McAssetsFixList(Instance, CheckAssetsHash, Task);
+            }) { ProgressWeight = 0.01 });
+            // 下载资源文件
+            LoadersAssets.Add(new LoaderDownload("下载资源文件", new List<NetFile>()) { ProgressWeight = 25 });
+            // 构造加载器
+            Loaders.Add(new LoaderCombo<string>("下载资源文件（主加载器）", LoadersAssets) { Block = false, Show = false, ProgressWeight = 27 });
+
+            // 后台独立更新索引
+            if (DownloadAssetIndexInBackground) {
+                string RealAddressBg = null;
+                string TempAddressBg = null;
+                List<LoaderBase> LoadersAssetsUpdate = new List<LoaderBase>();
+                LoadersAssetsUpdate.Add(new LoaderTask<string, List<NetFile>>("后台分析资源文件索引地址",
+                Task => {
+                    NetFile IndexFile = DlClientAssetIndexGet(Instance);
+                    if (IndexFile is null) {
+                        Logger.Warn($"未找到版本 {Instance.Name} 的合适的资源索引下载地址，游戏 assets 可能缺失");
+                        Task.Cancel();
+                        throw new OperationCanceledException();
+                    }
+                    RealAddressBg = IndexFile.LocalPath;
+                    TempAddressBg = PclCore.GetPathTemp() + "Cache\\" + IndexFile.LocalName + "_background";
+                    IndexFile.LocalPath = TempAddressBg;
+                    Task.Output = new List<NetFile> { IndexFile };
+                    // 检查是否需要更新：每天只更新一次
+                    DateTime LastUpdate = FileUtils.GetInfo(RealAddressBg).LastWriteTime.Date;
+                    if (FileUtils.Exists(RealAddressBg) && Math.Abs((LastUpdate - DateTime.Now.Date).TotalDays) < 1) {
+                        Logger.Info($"无需更新资源文件索引，上次更新于 {LastUpdate}");
+                        Task.Cancel();
+                    }
+                }));
+                LoadersAssetsUpdate.Add(new LoaderDownload("后台下载资源文件索引", new List<NetFile>()));
+                LoaderCombo<string> Updater = new LoaderCombo<string>("后台更新资源文件索引", LoadersAssetsUpdate);
+                Logger.Info("开始后台检查资源文件索引");
+                Updater.Start();
+            }
+        }
+        #endregion
+
+        return Loaders;
+    }
+
+    #endregion
+
 }
 
 public struct DlClientListResult {

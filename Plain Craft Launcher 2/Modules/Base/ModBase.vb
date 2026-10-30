@@ -150,6 +150,12 @@ Public Module ModBase
         If PclUiBridge.McInstanceSelectedGet Is Nothing Then
             PclUiBridge.McInstanceSelectedGet = Function() McInstanceSelected
         End If
+        If PclUiBridge.McInstanceSelectedSet Is Nothing Then
+            PclUiBridge.McInstanceSelectedSet = Sub(Instance As McInstance) McInstanceSelected = Instance
+        End If
+        If PclUiBridge.ExtractResources Is Nothing Then
+            PclUiBridge.ExtractResources = Sub(FilePath As String, ResourceName As String) ExtractResources(FilePath, ResourceName)
+        End If
         If PclUiBridge.McLaunchLog Is Nothing Then
             PclUiBridge.McLaunchLog = Sub(Text As String, Level As LogLevel) McLaunchLog(Text, Level)
         End If

@@ -63,6 +63,10 @@ public static class PclUiBridge {
     public static Action<object> SwitchToInstanceSetup;
     /// <summary>对应 ModJava.MigrateInstanceJavaSettings（迁移版本独立 Java 设置，操作 VB UI）。</summary>
     public static Action<object, System.Threading.CancellationToken, ProgressProvider> MigrateInstanceJavaSettings;
+    /// <summary>对应 ModMinecraft.McInstanceSelected（写）。</summary>
+    public static Action<McInstance> McInstanceSelectedSet;
+    /// <summary>对应 ModBase.ExtractResources(FilePath, ResourceName)。</summary>
+    public static Action<string, string> ExtractResources;
     /// <summary>对应 ModMinecraft.McInstanceSelected（读）。</summary>
     public static Func<McInstance> McInstanceSelectedGet;
     /// <summary>对应 ModLaunch.McLaunchLog(Text, Level)。</summary>
