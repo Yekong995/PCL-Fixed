@@ -75,6 +75,17 @@ public static class PclCore {
         return (T)SettingProvider(Key, Instance);
     }
 
+    /// <summary>
+    /// 由宿主（VB UI）设置，用于写入全局/实例设置项，避免 C# 反向依赖 Settings。
+    /// 参数为（键，值，实例），实例可为 null。
+    /// </summary>
+    public static Action<string, object, object> SettingSetter;
+
+    /// <summary>写入设置项（经由 VB Settings 实现）。</summary>
+    public static void SetSetting(string Key, object Value, object Instance = null) {
+        SettingSetter(Key, Value, Instance);
+    }
+
     #endregion
 
     #region 文件

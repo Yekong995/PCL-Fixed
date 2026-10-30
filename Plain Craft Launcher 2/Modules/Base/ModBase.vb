@@ -101,6 +101,12 @@ Public Module ModBase
         If PclUiBridge.LoaderTaskbar Is Nothing Then
             PclUiBridge.LoaderTaskbar = Function() LoaderTaskbar.ToList
         End If
+        If PclCore.SettingSetter Is Nothing Then
+            PclCore.SettingSetter = Sub(Key As String, Value As Object, Instance As Object) Settings.Set(Key, Value, TryCast(Instance, McInstance))
+        End If
+        If PclUiBridge.McDownloadClientUpdateHint Is Nothing Then
+            PclUiBridge.McDownloadClientUpdateHint = Sub(Version As String, Json As JObject) McDownloadClientUpdateHint(Version, Json)
+        End If
         Return True
     End Function
     ''' <summary>

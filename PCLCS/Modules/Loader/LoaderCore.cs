@@ -45,6 +45,8 @@ public static class PclUiBridge {
     public static Func<IEnumerable<string>> McFolderListProvider;
     /// <summary>对应 ModLoader.LoaderTaskbar.ToList()。</summary>
     public static Func<List<LoaderBase>> LoaderTaskbar;
+    /// <summary>对应 ModMinecraft.McDownloadClientUpdateHint(Version, Json)。</summary>
+    public static Action<string, Newtonsoft.Json.Linq.JObject> McDownloadClientUpdateHint;
 }
 
 /// <summary>
