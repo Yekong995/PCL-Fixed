@@ -123,6 +123,30 @@ Public Module ModBase
         If PclCore.HasSavedProvider Is Nothing Then
             PclCore.HasSavedProvider = Function(Key As String, Instance As Object) Settings.HasSaved(Key, Instance:=TryCast(Instance, McInstance))
         End If
+        If PclUiBridge.ShowJavaMsgBox Is Nothing Then
+            PclUiBridge.ShowJavaMsgBox = Sub(Text As String, Title As String, Warn As Boolean) If Warn Then MyMsgBox(Text, Title, IsWarn:=True, ForceWait:=True) Else MyMsgBox(Text, Title)
+        End If
+        If PclUiBridge.UpdateJavaListPages Is Nothing Then
+            PclUiBridge.UpdateJavaListPages = Sub()
+                FrmSetupLaunch?.UpdateJavaList()
+                FrmInstanceSetup?.UpdateJavaList()
+            End Sub
+        End If
+        If PclUiBridge.ReloadCurrentJava Is Nothing Then
+            PclUiBridge.ReloadCurrentJava = Sub() PageInstanceLeft.ReloadCurrentJava()
+        End If
+        If PclUiBridge.SwitchToInstanceSetup Is Nothing Then
+            PclUiBridge.SwitchToInstanceSetup = Sub(Instance As Object)
+                RunInUi(
+                Sub()
+                    PageInstanceLeft.Instance = DirectCast(Instance, McInstance)
+                    FrmMain.PageChange(FormMain.PageType.InstanceSetup, FormMain.PageSubType.InstanceSetup)
+                End Sub)
+            End Sub
+        End If
+        If PclUiBridge.MigrateInstanceJavaSettings Is Nothing Then
+            PclUiBridge.MigrateInstanceJavaSettings = Sub(Instance As Object, c As CancellationToken, p As ProgressProvider) MigrateInstanceJavaSettings(DirectCast(Instance, McInstance), c, p)
+        End If
         Return True
     End Function
     ''' <summary>

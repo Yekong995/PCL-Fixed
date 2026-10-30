@@ -53,6 +53,16 @@ public static class PclUiBridge {
     public static Func<string, string> GetMcFoolName;
     /// <summary>对应 McInstance.ResetSettingsCache 中清理版本独立设置缓存的部分。参数为版本文件夹路径。</summary>
     public static Action<string> ResetInstanceSettingsCache;
+    /// <summary>对应 ModJava 中 MyMsgBox 的两类调用（是否 IsWarn/ForceWait）。</summary>
+    public static Action<string, string, bool> ShowJavaMsgBox;
+    /// <summary>对应 FrmSetupLaunch?.UpdateJavaList() 与 FrmInstanceSetup?.UpdateJavaList()。</summary>
+    public static Action UpdateJavaListPages;
+    /// <summary>对应 PageInstanceLeft.ReloadCurrentJava()。</summary>
+    public static Action ReloadCurrentJava;
+    /// <summary>对应 ModJava.SwitchToInstanceSetup（切换页面并设置实例）。</summary>
+    public static Action<object> SwitchToInstanceSetup;
+    /// <summary>对应 ModJava.MigrateInstanceJavaSettings（迁移版本独立 Java 设置，操作 VB UI）。</summary>
+    public static Action<object, System.Threading.CancellationToken, ProgressProvider> MigrateInstanceJavaSettings;
 }
 
 /// <summary>
