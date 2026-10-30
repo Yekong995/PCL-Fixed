@@ -309,7 +309,7 @@ Public Class PageDownloadModify
         LabMinecraftVersion.Text = VanillaName
         TextSelectName.Text = OriginalName
         IsSelectNameEdited = Not String.Equals(OriginalName, GetSelectName(), StringComparison.Ordinal)
-        TextSelectName.ValidateRules = New ObjectModel.Collection(Of Validate) From {
+        TextSelectName.ValidateRules = New ObjectModel.Collection(Of ValidateBase) From {
             New ValidateFolderName(McFolderSelected & "versions", IgnoreList:=New List(Of String) From {OriginalName})}
         '修改页 UI
         CardMinecraft.Visibility = Visibility.Visible

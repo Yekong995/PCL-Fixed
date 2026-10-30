@@ -91,7 +91,7 @@ Public Class PageInstanceOverall
     Private Sub BtnDisplayDesc_Click(sender As Object, e As EventArgs) Handles BtnDisplayDesc.Click
         Try
             Dim OldInfo As String = ReadIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "CustomInfo")
-            Dim NewInfo As String = MyMsgBoxInput("更改描述", "修改版本的描述文本，留空则使用 PCL 的默认描述。", OldInfo, New ObjectModel.Collection(Of Validate), "默认描述")
+            Dim NewInfo As String = MyMsgBoxInput("更改描述", "修改版本的描述文本，留空则使用 PCL 的默认描述。", OldInfo, New ObjectModel.Collection(Of ValidateBase), "默认描述")
             If NewInfo IsNot Nothing AndAlso OldInfo <> NewInfo Then WriteIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "CustomInfo", NewInfo)
             PageInstanceLeft.Instance = New McInstance(PageInstanceLeft.Instance.Name).Load()
             Reload()
@@ -111,7 +111,7 @@ Public Class PageInstanceOverall
             '确认输入的新名称
             Dim OldName As String = PageInstanceLeft.Instance.Name
             '修改此部分的同时修改快速安装的版本名检测*
-            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {
+            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of ValidateBase) From {
                 New ValidateFolderName(McFolderSelected & "versions", IgnoreList:=New List(Of String) From {OldName})
             })
             If String.IsNullOrWhiteSpace(NewName) Then Return

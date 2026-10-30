@@ -157,7 +157,7 @@ Public Class PageSelectLeft
             End If
             If DefaultName.Length > 40 Then DefaultName = DefaultName.Substring(0, 39)
             Dim NewName As String = MyMsgBoxInput("输入显示名称", "输入该文件夹在左边栏列表中显示的名称。", DefaultName,
-                                              New ObjectModel.Collection(Of Validate) From {New ValidateNullOrWhiteSpace, New ValidateLength(1, 30), New ValidateExcept({">", "|"})})
+                                              New ObjectModel.Collection(Of ValidateBase) From {New ValidateNullOrWhiteSpace, New ValidateLength(1, 30), New ValidateExcept({">", "|"})})
             If String.IsNullOrWhiteSpace(NewName) Then Return
             '添加文件夹
             AddFolder(NewFolder, NewName, True)
@@ -312,7 +312,7 @@ Public Class PageSelectLeft
                          "该文件夹中的游戏存档、游戏版本，以及 MC 之外的其他文件，都会永久丢失，不可恢复！" & vbCrLf &
                          "目标文件夹：" & Target.Location & vbCrLf & vbCrLf &
                          "如果确实要删除，请在下面输入【Potato】这个单词以继续。",
-                         ValidateRules:=New ObjectModel.Collection(Of Validate) From {New ValidateSame("Potato", $"请输入 {vbLQ}Potato{vbRQ}", IgnoreCase:=True)},
+                         ValidateRules:=New ObjectModel.Collection(Of ValidateBase) From {New ValidateSame("Potato", $"请输入 {vbLQ}Potato{vbRQ}", IgnoreCase:=True)},
                          Button1:="永久删除文件夹", Button2:="取消", IsWarn:=True) Is Nothing Then Return
         RemoveFolderFromSetup(Target)
         RunInNewThread(
@@ -368,7 +368,7 @@ Public Class PageSelectLeft
             '获取输入
             Dim NewName As String =
                 MyMsgBoxInput("输入新名称", "", Folder.Name,
-                              New ObjectModel.Collection(Of Validate) From {New ValidateNullOrWhiteSpace, New ValidateLength(1, 30), New ValidateExcept({">", "|"})})
+                              New ObjectModel.Collection(Of ValidateBase) From {New ValidateNullOrWhiteSpace, New ValidateLength(1, 30), New ValidateExcept({">", "|"})})
             If String.IsNullOrWhiteSpace(NewName) Then Return
             '修改自定义名
             Dim Folders As New List(Of String)(Settings.Get(Of String)("LaunchFolders").Split("|"))

@@ -32,7 +32,7 @@ Public Class PageDownloadInstall
         DlNeoForgeListLoader.Start()
 
         '重载预览
-        TextSelectName.ValidateRules = New ObjectModel.Collection(Of Validate) From {New ValidateFolderName(McFolderSelected & "versions")}
+        TextSelectName.ValidateRules = New ObjectModel.Collection(Of ValidateBase) From {New ValidateFolderName(McFolderSelected & "versions")}
         TextSelectName.Validate()
         ReloadSelected()
     End Sub

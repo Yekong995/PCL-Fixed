@@ -21,7 +21,7 @@ Public Class PageInstanceSetup
         AddHandler PageInstanceLeft.CurrentJavaWorker.Stopped, AddressOf UpdateJavaRelatedUi
 
         '版本范围校验
-        TextArgumentJavaRange.ValidateRules = New ObjectModel.Collection(Of Validate) From {New ValidateFunc(
+        TextArgumentJavaRange.ValidateRules = New ObjectModel.Collection(Of ValidateBase) From {New ValidateFunc(
         Function(Str As String)
             Try
                 If String.IsNullOrWhiteSpace(Str) Then Return "不能为空"

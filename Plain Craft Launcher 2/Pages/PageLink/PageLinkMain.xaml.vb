@@ -95,7 +95,7 @@ Public Class PageLinkMain
     Private Sub Create_MouseLeftButtonUp() Handles PanSelectCreate.MouseLeftButtonUp
         '输入端口号
         Dim Port As String = MyMsgBoxInput("输入端口", $"在单人游戏的暂停菜单选择 {vbLQ}对局域网开放{vbRQ}，然后输入端口数字。{vbCrLf}甚至可以输入其他游戏的端口……嗯……",
-            ValidateRules:=New Collection(Of Validate) From {New ValidateInteger(1024, 65535)},
+            ValidateRules:=New Collection(Of ValidateBase) From {New ValidateInteger(1024, 65535)},
             HintText:="端口号")
         If Port Is Nothing Then Return
         '基础信息

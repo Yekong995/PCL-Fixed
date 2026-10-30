@@ -170,7 +170,7 @@ EndHint:
         ''' <summary>
         ''' 输入模式：输入验证规则。
         ''' </summary>
-        Public ValidateRules As Collection(Of Validate)
+        Public ValidateRules As Collection(Of ValidateBase)
         ''' <summary>
         ''' 输入模式：提示文本。
         ''' </summary>
@@ -283,9 +283,9 @@ EndHint:
     ''' <param name="Button1">显示的第一个按钮，默认为“确定”。</param>
     ''' <param name="Button2">显示的第二个按钮，默认为“取消”。</param>
     ''' <param name="IsWarn">是否为警告弹窗，若为 True，弹窗配色和背景会变为红色。</param>
-    Public Function MyMsgBoxInput(Title As String, Optional Text As String = Nothing, Optional DefaultInput As String = Nothing, Optional ValidateRules As Collection(Of Validate) = Nothing, Optional HintText As String = "", Optional Button1 As String = "确定", Optional Button2 As String = "取消", Optional IsWarn As Boolean = False) As String
+    Public Function MyMsgBoxInput(Title As String, Optional Text As String = Nothing, Optional DefaultInput As String = Nothing, Optional ValidateRules As Collection(Of ValidateBase) = Nothing, Optional HintText As String = "", Optional Button1 As String = "确定", Optional Button2 As String = "取消", Optional IsWarn As Boolean = False) As String
         '将弹窗列入队列
-        Dim Converter As New MyMsgBoxConverter With {.Text = If(Text, ""), .HintText = If(HintText, ""), .Type = MyMsgBoxType.Input, .ValidateRules = If(ValidateRules, New Collection(Of Validate)), .Button1 = Button1, .Button2 = Button2, .Content = DefaultInput, .IsWarn = IsWarn, .Title = Title}
+        Dim Converter As New MyMsgBoxConverter With {.Text = If(Text, ""), .HintText = If(HintText, ""), .Type = MyMsgBoxType.Input, .ValidateRules = If(ValidateRules, New Collection(Of ValidateBase)), .Button1 = Button1, .Button2 = Button2, .Content = DefaultInput, .IsWarn = IsWarn, .Title = Title}
         WaitingMyMsgBox.Enqueue(Converter)
         '虽然我也不知道这是啥但是能用就成了 :)
         Try

@@ -100,16 +100,16 @@ Public Class MyTextBox
     ''' <summary>
     ''' 输入验证的规则。
     ''' </summary>
-    Public Property ValidateRules As ObjectModel.Collection(Of Validate)
+    Public Property ValidateRules As ObjectModel.Collection(Of ValidateBase)
         Get
             Return _ValidateRules
         End Get
-        Set(Value As ObjectModel.Collection(Of Validate))
+        Set(Value As ObjectModel.Collection(Of ValidateBase))
             _ValidateRules = Value
             Validate()
         End Set
     End Property
-    Private _ValidateRules As New ObjectModel.Collection(Of Validate)
+    Private _ValidateRules As New ObjectModel.Collection(Of ValidateBase)
     ''' <summary>
     ''' 进行输入验证。
     ''' </summary>

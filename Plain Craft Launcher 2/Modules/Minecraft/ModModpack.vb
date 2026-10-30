@@ -171,7 +171,7 @@ Public Module ModModpack
             InstanceName = If(Json("name"), "")
             Dim Validate As New ValidateFolderName(McFolderSelected & "versions")
             If Validate.Validate(InstanceName) <> "" Then InstanceName = ""
-            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of Validate) From {Validate})
+            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of ValidateBase) From {Validate})
             If String.IsNullOrEmpty(InstanceName) Then Throw New OperationCanceledException
         End If
         Dim VersionFolder As String = PathUtils.AddSlashSuffix(Path.Combine(McFolderSelected, "versions", InstanceName) & "\")
@@ -393,7 +393,7 @@ Public Module ModModpack
             InstanceName = If(Json("name"), "")
             Dim Validate As New ValidateFolderName(McFolderSelected & "versions")
             If Validate.Validate(InstanceName) <> "" Then InstanceName = ""
-            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of Validate) From {Validate})
+            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of ValidateBase) From {Validate})
             If String.IsNullOrEmpty(InstanceName) Then Throw New OperationCanceledException
         End If
         Dim VersionFolder As String = Path.Combine(McFolderSelected, "versions", InstanceName) & "\"
@@ -498,7 +498,7 @@ Public Module ModModpack
         Dim InstanceName As String = If(Json("name"), "")
         Dim Validate As New ValidateFolderName(McFolderSelected & "versions")
         If Validate.Validate(InstanceName) <> "" Then InstanceName = ""
-        If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of Validate) From {Validate})
+        If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of ValidateBase) From {Validate})
         If String.IsNullOrEmpty(InstanceName) Then Throw New OperationCanceledException
         Dim VersionFolder As String = Path.Combine(McFolderSelected, "versions", InstanceName) & "\"
         '解压
@@ -548,7 +548,7 @@ Public Module ModModpack
         Dim InstanceName As String = If(PackInstance.RegexSeek("(?<=\nname\=)[^\n]+"), "")
         Dim Validate As New ValidateFolderName(McFolderSelected & "versions")
         If Validate.Validate(InstanceName) <> "" Then InstanceName = ""
-        If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of Validate) From {Validate})
+        If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of ValidateBase) From {Validate})
         If String.IsNullOrEmpty(InstanceName) Then Throw New OperationCanceledException
         Dim VersionFolder As String = Path.Combine(McFolderSelected, "versions", InstanceName) & "\"
         '解压
@@ -684,7 +684,7 @@ Public Module ModModpack
             InstanceName = If(Json("name"), "")
             Dim Validate As New ValidateFolderName(McFolderSelected & "versions")
             If Validate.Validate(InstanceName) <> "" Then InstanceName = ""
-            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of Validate) From {Validate})
+            If InstanceName = "" Then InstanceName = MyMsgBoxInput("输入版本名称", "", "", New Collection(Of ValidateBase) From {Validate})
             If String.IsNullOrEmpty(InstanceName) Then Throw New OperationCanceledException
         End If
         Dim VersionFolder As String = Path.Combine(McFolderSelected, "versions", InstanceName) & "\"
