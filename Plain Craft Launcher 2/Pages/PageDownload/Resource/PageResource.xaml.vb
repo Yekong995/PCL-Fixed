@@ -182,7 +182,7 @@ Public Class PageResource
     End Sub
 
     '自动重试
-    Private Sub Load_State(sender As Object, state As MyLoading.MyLoadingState, oldState As MyLoading.MyLoadingState) Handles Load.StateChanged
+    Private Sub Load_State(sender As Object, state As MyLoadingState, oldState As MyLoadingState) Handles Load.StateChanged
         Select Case Loader.State
             Case LoadState.Failed
                 Dim ErrorMessage As String = ""

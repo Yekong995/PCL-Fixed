@@ -95,14 +95,6 @@ Public Class MyLoading
 
 #Region "状态改变"
 
-    '状态枚举
-    Public Enum MyLoadingState
-        Unloaded = -1
-        Run = 0
-        [Stop] = 1
-        [Error] = 2
-    End Enum
-
     '用于外部改变的公开状态
     Private WithEvents _State As ILoadingTrigger
     Public Property State As ILoadingTrigger
@@ -248,13 +240,6 @@ Public Class MyLoading
 
 End Class
 
-Public Interface ILoadingTrigger
-    ReadOnly Property IsLoader As Boolean
-    Property LoadingState As MyLoadingState
-    Event LoadingStateChanged(NewState As MyLoadingState, OldState As MyLoadingState)
-    Event ProgressChanged(NewProgress As Double, OldProgress As Double)
-End Interface
-
 Public Class MyLoadingStateSimulator
     Implements ILoadingTrigger
     Private Property _LoadingState As MyLoadingState = MyLoadingState.Unloaded
@@ -271,6 +256,6 @@ Public Class MyLoadingStateSimulator
     End Property
     Public ReadOnly Property IsLoader As Boolean = False Implements ILoadingTrigger.IsLoader
 
-    Public Event LoadingStateChanged(NewState As MyLoadingState, OldState As MyLoadingState) Implements ILoadingTrigger.LoadingStateChanged
-    Public Event ProgressChanged(NewProgress As Double, OldProgress As Double) Implements ILoadingTrigger.ProgressChanged
+    Public Event LoadingStateChanged As Action(Of MyLoadingState, MyLoadingState) Implements ILoadingTrigger.LoadingStateChanged
+    Public Event ProgressChanged As Action(Of Double, Double) Implements ILoadingTrigger.ProgressChanged
 End Class

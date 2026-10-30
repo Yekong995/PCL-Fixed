@@ -1180,12 +1180,12 @@ Public Class PageDownloadInstall
         If Loader Is Nothing Then Return "获取中……"
         If Not Loader.State.IsLoader Then Return "获取中……"
         Select Case Loader.State.LoadingState
-            Case MyLoading.MyLoadingState.Run
+            Case MyLoadingState.Run
                 Return "获取中……"
-            Case MyLoading.MyLoadingState.Error
+            Case MyLoadingState.Error
                 Dim Message As String = CType(Loader.State, LoaderBase).Error.Message
                 Return If(Message = "无", "无", "获取失败：" & Message)
-            Case MyLoading.MyLoadingState.Unloaded
+            Case MyLoadingState.Unloaded
                 Return "未知错误，状态为 Unloaded"
             Case Else
                 Return Nothing

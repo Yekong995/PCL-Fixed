@@ -43,6 +43,19 @@ Public Module ModBase
         Return True
     End Function
     ''' <summary>
+    ''' 在模块初始化时把 Settings 读取与 UI 回调桥接到 C# 层。
+    ''' </summary>
+    Private ReadOnly BridgeInitHook As Boolean = InitBridges()
+    Private Function InitBridges() As Boolean
+        If PclCore.SettingProvider Is Nothing Then
+            PclCore.SettingProvider = Function(Key As String, Instance As Object) Settings.Get(Key, TryCast(Instance, McInstance))
+        End If
+        If PclUiBridge.DownloadExtraRefresh Is Nothing Then
+            PclUiBridge.DownloadExtraRefresh = Sub() If FrmMain IsNot Nothing Then FrmMain.BtnExtraDownload.ShowRefresh()
+        End If
+        Return True
+    End Function
+    ''' <summary>
     ''' 主窗口句柄。
     ''' </summary>
     Public Property Handle As IntPtr

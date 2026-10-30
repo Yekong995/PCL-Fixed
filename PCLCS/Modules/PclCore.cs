@@ -64,6 +64,17 @@ public static class PclCore {
     /// <summary>由宿主（VB UI）设置，用于计算缓存文件夹默认值，避免 C# 反向依赖 Settings。</summary>
     public static Func<string> PathTempDefaultProvider;
 
+    /// <summary>
+    /// 由宿主（VB UI）设置，用于读取全局/实例设置项，避免 C# 反向依赖 Settings。
+    /// 参数为（键，实例），实例可为 null。
+    /// </summary>
+    public static Func<string, object, object> SettingProvider;
+
+    /// <summary>读取设置项（经由 VB Settings 实现）。</summary>
+    public static T GetSetting<T>(string Key, object Instance = null) {
+        return (T)SettingProvider(Key, Instance);
+    }
+
     #endregion
 
     #region 文件

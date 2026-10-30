@@ -158,7 +158,7 @@ Public Class PageLaunchLeft
         '初始化其他页面
         PanInput.IsHitTestVisible = False
         PanLaunching.IsHitTestVisible = False
-        LoadLaunching.State.LoadingState = MyLoading.MyLoadingState.Run
+        LoadLaunching.State.LoadingState = MyLoadingState.Run
         PanLaunching.Visibility = Visibility.Visible
         AniStart({
                 AaOpacity(PanInput, 0, 50), '略作延迟，这样如果预检测失败，不会出现奇怪的弹一下的动画
@@ -176,7 +176,7 @@ Public Class PageLaunchLeft
         PageGet(PageCurrent).Reload(KeepInput:=False)
         PanInput.IsHitTestVisible = False
         PanLaunching.IsHitTestVisible = False
-        LoadLaunching.State.LoadingState = MyLoading.MyLoadingState.Stop
+        LoadLaunching.State.LoadingState = MyLoadingState.Stop
         PanInput.Visibility = Visibility.Visible
         AniStart({
             AaOpacity(PanLaunching, -PanLaunching.Opacity, 150),

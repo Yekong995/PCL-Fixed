@@ -1310,6 +1310,14 @@ Retry:
     ''' </summary>
     Public Class LoaderDownload
         Inherits LoaderBase
+        Implements IDownloadLoader
+
+        ''' <summary>
+        ''' 供 C# 侧 LoaderCombo 调用的入口，避免 C# 反向依赖 VB 的 NetFile 类型。
+        ''' </summary>
+        Public Sub StartDownload(Input As Object, IsForceRestart As Boolean) Implements IDownloadLoader.StartDownload
+            Start(If(TypeOf Input Is List(Of NetFile), Input, Nothing), IsForceRestart)
+        End Sub
 
 #Region "属性"
 
