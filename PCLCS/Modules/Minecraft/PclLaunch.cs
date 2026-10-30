@@ -514,7 +514,7 @@ public static class PclLaunch {
         } catch (Exception ex) {
             // 兜底：确保真实异常始终落盘（绕过日志系统，避免日志链自身异常导致堆栈丢失）
             try {
-                System.IO.File.WriteAllText(Paths.Base + "PCL\\java_error.txt", ex.ToString());
+                System.IO.File.WriteAllText(Paths.Base + "java_error.txt", ex.ToString());
             } catch {
             }
             Logger.Error(ex, "选择 Java 时出现异常（McLaunchJava 兜底）", LogBehavior.Toast);
