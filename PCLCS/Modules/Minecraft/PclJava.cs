@@ -459,6 +459,10 @@ public static class PclJava {
             }
         } catch (Exception ex) {
             ex.ThrowIfCanceled();
+            try {
+                System.IO.File.WriteAllText(Paths.Base + "PCL\\java_error.txt", ex.ToString()); // 兜底落盘，绕过日志系统
+            } catch {
+            }
             Logger.Error(ex, "选择 Java 时出现异常", LogBehavior.Toast);
             p?.Skip(); return null;
         }
