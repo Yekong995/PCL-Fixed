@@ -1138,10 +1138,11 @@ public static class PclMc {
                 Raw = Raw.Replace(Token, new string(FilterChar, Token.Length));
             }
         }
-        // 打码当前登录的结果
-        string AccessToken = PclUiBridge.McLoginLoaderOutputGet().AccessToken;
+        // 打码当前登录的结果（桥可能尚未注册或登录未完成，需空安全）
+        McLoginResult LoginOutput = PclUiBridge.McLoginLoaderOutputGet?.Invoke() ?? default;
+        string AccessToken = LoginOutput.AccessToken;
         if (AccessToken is not null && AccessToken.Length >= 10 && Raw.ContainsIgnoreCase(AccessToken) &&
-            PclUiBridge.McLoginLoaderOutputGet().Uuid != PclUiBridge.McLoginLoaderOutputGet().AccessToken) { // UUID 和 AccessToken 一样则不打码
+            LoginOutput.Uuid != AccessToken) { // UUID 和 AccessToken 一样则不打码
             Raw = Raw.Replace(AccessToken, AccessToken.Substring(0, 5) + new string(FilterChar, AccessToken.Length - 10) + AccessToken.Substring(AccessToken.Length - 5));
         }
         return Raw;

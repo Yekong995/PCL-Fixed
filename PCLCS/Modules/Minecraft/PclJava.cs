@@ -459,7 +459,7 @@ public static class PclJava {
             }
         } catch (Exception ex) {
             ex.ThrowIfCanceled();
-            Logger.Error(ex, "选择 Java 时出现异常");
+            Logger.Error(ex, "选择 Java 时出现异常", LogBehavior.Toast);
             p?.Skip(); return null;
         }
     }
