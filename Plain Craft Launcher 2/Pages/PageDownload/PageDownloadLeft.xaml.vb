@@ -11,11 +11,6 @@ Public Class PageDownloadLeft
     '隐藏 MC 下载
     Public Sub New()
         InitializeComponent()
-        If Not RestrictMcDownload Then Return
-        ItemInstall.Visibility = Visibility.Collapsed
-        LabResource.Visibility = Visibility.Collapsed
-        PageID = FormMain.PageSubType.DownloadMod
-        ItemMod.Checked = True
     End Sub
 
     ''' <summary>
