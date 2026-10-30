@@ -515,9 +515,18 @@ public abstract class LoaderBase : ILoadingTrigger {
 }
 
 /// <summary>
+/// 供 LoaderCombo 以非泛型方式调用 LoaderTask 的重启判断与输出读取。
+/// C# 的 dynamic 无法把 object 表达式绑定到 ref 泛型参数（RuntimeBinderException），改用此接口。
+/// </summary>
+public interface ILoaderTaskRestartable {
+    bool ShouldRestartWithInput(object Input, bool IsForceRestart, bool IgnoreReloadTimeout);
+    object GetOutput();
+}
+
+/// <summary>
 /// 用于异步执行并监控单一函数的加载器。
 /// </summary>
-public class LoaderTask<TIn, TOut> : LoaderBase {
+public class LoaderTask<TIn, TOut> : LoaderBase, ILoaderTaskRestartable {
 
     // 线程设定
     protected internal ThreadPriority ThreadPriority;
@@ -677,6 +686,15 @@ public class LoaderTask<TIn, TOut> : LoaderBase {
         this.LoadDelegate = LoadDelegate;
         this.InputDelegate = InputDelegate is null ? null : () => InputDelegate();
         this.ThreadPriority = Priority;
+    }
+
+    // ILoaderTaskRestartable：供 LoaderCombo 非泛型调用（VB 原经 CType(Loader, Object).ShouldStart 后期绑定）
+    bool ILoaderTaskRestartable.ShouldRestartWithInput(object Input, bool IsForceRestart, bool IgnoreReloadTimeout) {
+        TIn typed = Input is null ? default : (TIn)Input;
+        return ShouldStart(ref typed, IsForceRestart, IgnoreReloadTimeout);
+    }
+    object ILoaderTaskRestartable.GetOutput() {
+        return Output;
     }
 
 }
@@ -869,21 +887,21 @@ public class LoaderCombo<InputType> : LoaderBase {
             switch (Loader.State) {
                 case LoadState.Finished:
                     // 检查 LoaderTask 是否需要重启
-                    if (GeneralUtils.IsGenericInstanceOf(Loader, typeof(LoaderTask<,>))) {
-                        if (((dynamic)Loader).ShouldStart(Input is not null && Loader.GetType().GenericTypeArguments[0] == Input.GetType() ? Input : null, false, true)) {
+                    if (GeneralUtils.IsGenericInstanceOf(Loader, typeof(LoaderTask<,>)) && Loader is ILoaderTaskRestartable restartable) {
+                        if (restartable.ShouldRestartWithInput(Input is not null && Loader.GetType().GenericTypeArguments[0] == Input.GetType() ? Input : null, false, true)) {
                             Logger.Info($"由于输入条件变更，重启已完成的加载器 {Loader.Name}");
                             goto Restart;
                         }
                         // 更新下一个加载器的输入
-                        Input = ((dynamic)Loader).Output;
+                        Input = restartable.GetOutput();
                     }
                     // 如果不让继续启动，且已有加载器正在加载中，就不继续启动
                     if (Loader.Block && !IsFinished) Blocked = true;
                     break;
                 case LoadState.Loading:
                     // 检查 LoaderTask 是否需要重启
-                    if (GeneralUtils.IsGenericInstanceOf(Loader, typeof(LoaderTask<,>))) {
-                        if (((dynamic)Loader).ShouldStart(Input is not null && Loader.GetType().GenericTypeArguments[0] == Input.GetType() ? Input : null, false, true)) {
+                    if (GeneralUtils.IsGenericInstanceOf(Loader, typeof(LoaderTask<,>)) && Loader is ILoaderTaskRestartable restartableLoading) {
+                        if (restartableLoading.ShouldRestartWithInput(Input is not null && Loader.GetType().GenericTypeArguments[0] == Input.GetType() ? Input : null, false, true)) {
                             Logger.Warn($"由于输入条件变更，重启进行中的加载器 {Loader.Name}");
                             goto Restart;
                         }
