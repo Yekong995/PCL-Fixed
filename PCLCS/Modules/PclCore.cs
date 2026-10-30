@@ -1,5 +1,5 @@
 // 由 VB Modules\Base\ModBase.vb 的纯逻辑部分迁移而来。
-// 依赖 VB UI 的成员（MyColor、DPI、剪贴板、资源释放、网页打开等）保留在 VB ModBase 中，
+// 依赖 VB UI 的成员（DPI、剪贴板、资源释放、网页打开、Logo 图标等）保留在 VB ModBase 中，
 // VB 侧通过同名成员转发到本类，确保 VB 调用点无需修改。
 #nullable disable
 
