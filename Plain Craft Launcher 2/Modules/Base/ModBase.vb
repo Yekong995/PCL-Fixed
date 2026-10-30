@@ -64,6 +64,7 @@ Public Module ModBase
         End If
         If PclUiBridge.ShowHint Is Nothing Then
             PclUiBridge.ShowHint = Sub(Text As String, Type As HintType) Hint(Text, Type)
+            PclUiBridge.ShowHintSilent = Sub(Text As String, Type As HintType) Hint(Text, Type, False)
         End If
         If PclUiBridge.IsLauncherNewest Is Nothing Then
             PclUiBridge.IsLauncherNewest = Function() PageSetupSystem.IsLauncherNewest()

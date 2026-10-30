@@ -201,7 +201,7 @@ public static class ModMusic {
                 } else {
                     try {
                         MusicStartPlay(Address, IsFirstLoad);
-                        if (ShowHint) PclUiBridge.ShowHint("背景音乐已刷新：" + PathUtils.GetLastPart(Address), HintType.Green); // VB 原为 Hint(..., HintType.Green, False)，桥接版 Hint 不带 Log 参数
+                        if (ShowHint) PclUiBridge.ShowHintSilent?.Invoke("背景音乐已刷新：" + PathUtils.GetLastPart(Address), HintType.Green); // VB 原为 Hint(..., HintType.Green, False)
                     } catch {
                     }
                 }

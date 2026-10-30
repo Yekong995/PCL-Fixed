@@ -23,6 +23,8 @@ public static class PclUiBridge {
     public static Func<string, string, string, string, string, Action, int> ShowCrashMsgBox;
     /// <summary>对应 Hint(Text, Type)。</summary>
     public static Action<string, HintType> ShowHint;
+    /// <summary>对应 Hint(Text, Type, False)（不写入日志的提示）。</summary>
+    public static Action<string, HintType> ShowHintSilent;
     /// <summary>对应 PageSetupSystem.IsLauncherNewest()。</summary>
     public static Func<bool> IsLauncherNewest;
     /// <summary>对应 Telemetry(Event, Datas())。</summary>
