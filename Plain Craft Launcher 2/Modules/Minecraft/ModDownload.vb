@@ -1174,37 +1174,7 @@ Public Module ModDownload
     ''' </summary>
     Public Function DlModRequest(Url As String, Optional Method As HttpMethod = Nothing,
                                  Optional Content As String = Nothing, Optional ContentType As String = Nothing) As JToken
-        Dim Urls As New List(Of (Url As String, Timeout As Integer))
-        Dim McimUrl As String = DlSourceModGet(Url)
-        If McimUrl <> Url Then
-            Select Case Settings.Get(Of Integer)("ToolDownloadMod")
-                Case 0
-                    Urls.Add((McimUrl, 10))
-                    Urls.Add((McimUrl, 10))
-                    Urls.Add((Url, 30))
-                Case 1
-                    Urls.Add((Url, If(Url.Contains("modrinth"), 20, 10))) '至少 20s，要不然 Modrinth 返回不过来
-                    Urls.Add((McimUrl, 10))
-                    Urls.Add((Url, 30))
-                    Urls.Add((McimUrl, 30))
-                Case Else
-                    Urls.Add((Url, If(Url.Contains("modrinth"), 20, 10)))
-                    Urls.Add((Url, 30))
-                    Urls.Add((McimUrl, 30))
-            End Select
-        Else
-            Urls.Add((Url, If(Url.Contains("modrinth"), 20, 10)))
-            Urls.Add((Url, 30))
-        End If
-        Dim Errors As New List(Of Exception)
-        For Each Source In Urls
-            Try
-                Return NetRequestByClient(Source.Url, Method, Content, ContentType, Timeout:=Source.Timeout * 1000, Encoding:=Encoding.UTF8, RequireJson:=True).DeserializeJson()
-            Catch ex As Exception
-                Errors.Add(ex)
-            End Try
-        Next
-        Throw New AggregateException(Errors)
+        Return PclNet.DlModRequest(Url, Method, Content, ContentType)
     End Function
 
 #End Region
@@ -1302,14 +1272,7 @@ Public Module ModDownload
 
     'Mod 下载源
     Public Function DlSourceModGet(Original As String) As String
-        Return Original.
-            Replace("api.modrinth.com", "mod.mcimirror.top/modrinth").
-            Replace("staging-api.modrinth.com", "mod.mcimirror.top/modrinth").
-            Replace("cdn.modrinth.com", "mod.mcimirror.top").
-            Replace("api.curseforge.com", "mod.mcimirror.top/curseforge").
-            Replace("edge.forgecdn.net", "mod.mcimirror.top").
-            Replace("mediafilez.forgecdn.net", "mod.mcimirror.top").
-            Replace("media.forgecdn.net", "mod.mcimirror.top")
+        Return PclNet.DlSourceModGet(Original)
     End Function
 
     'Loader 自动切换
