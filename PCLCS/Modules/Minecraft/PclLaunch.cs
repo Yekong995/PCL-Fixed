@@ -2,10 +2,10 @@
 // VB UI 依赖（McLaunchLog、McInstanceSelected、McSkinSex、McJsonRuleCheck、McLibListGet、McAssetsGetIndexName、
 // ArgumentReplace、ModeDebug、VersionCode、DPI、PageInstanceSetup.GetRam、McLoginLoader.Output、McLoginRequestLogin、
 // FrmMain.PanForm 的窗口尺寸）通过 PclUiBridge 桥接，由 VB 宿主在启动时注册。
-// 需要 VB UI 的成员（McLoginAble、McLoginInput、McLoginStart、McLoginMsStart、McLoginRequestLogin、MsLoginStep1New、
-// MsLoginStep1Refresh、MsLoginStep3、MsLoginStep4、MsLoginStep5、MsLoginStep6、McLaunchStart、McLaunchLog、McLaunchState、
-// McLaunchMemoryOptimize、McLaunchPrecheck、McLaunchPrerun、McLaunchWait、McLaunchEnd 等）保留在 VB ModLaunch 中，
-// VB 侧通过同名转发壳调用本类的迁移函数。
+// 登录与启动流程（McLoginAble、McLoginInput、McLoginStart、McLoginMsStart、McLoginRequestLogin、MsLoginStep1New、
+// MsLoginStep1Refresh、MsLoginStep3、MsLoginStep4、MsLoginStep5、MsLoginStep6、McLaunchStart、McLaunchState、
+// McLaunchMemoryOptimize、McLaunchPrecheck、McLaunchPrerun、McLaunchWait、McLaunchEnd 等）已迁移至 PCLCS.Modules.PclLaunchUi，
+// VB 侧通过同名转发壳调用；纯 UI 的启动编排（Private McLaunchStart(Loader)、McLaunchLoader 等模块字段）仍保留在 VB ModLaunch 中。
 // McLibEntry 是 VB 类型（ModMinecraft），C# 无法直接引用，故 McLibListGet 以 IEnumerable<object> 桥接，
 // 在 C# 侧用 dynamic 访问其成员，行为与 VB 直接访问一致。
 #nullable disable
@@ -200,12 +200,16 @@ public static class PclLaunch {
     private static string McLaunchArgument;
     private static Encoding McLaunchEncoding;
 
-    // 对应 VB McLaunchLog(Text, Optional Level)，经 PclUiBridge.McLaunchLog 桥接
-    private static void McLaunchLog(string Text) {
-        PclUiBridge.McLaunchLog(Text, LogLevel.Info);
-    }
-    private static void McLaunchLog(string Text, LogLevel Level) {
-        PclUiBridge.McLaunchLog(Text, Level);
+    /// <summary>
+    /// 记录启动日志。
+    /// </summary>
+    public static void McLaunchLog(string Text, LogLevel Level = LogLevel.Info) {
+        Text = PclUiBridge.FilterUserName(PclUiBridge.FilterAccessToken(Text, '*'), '*');
+        if (PclUiBridge.ModeDebugGet()) {
+            PclCore.RunInUi(
+            () => PclUiBridge.AppendLaunchLog($"[{DateTime.Now:HH':'mm':'ss'.'fff'}] {Text}{Environment.NewLine}"));
+        }
+        Logger.Log(Text, Level);
     }
 
     #endregion

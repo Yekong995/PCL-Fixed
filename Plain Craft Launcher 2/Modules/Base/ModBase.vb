@@ -191,7 +191,8 @@ Public Module ModBase
             PclUiBridge.McLoginLoaderOutputGet = Function() McLoginLoader.Output
         End If
         If PclUiBridge.McLoginRequestLogin Is Nothing Then
-            PclUiBridge.McLoginRequestLogin = Function(Data As LoaderTask(Of McLoginServer, McLoginResult)) McLoginRequestLogin(Data)
+            'ModLaunch：McLoginRequestLogin 已迁移至 C#（PCLCS.Modules.PclLaunchUi）
+            PclUiBridge.McLoginRequestLogin = AddressOf PclLaunchUi.McLoginRequestLogin
         End If
         If PclUiBridge.LauncherWindowSize Is Nothing Then
             PclUiBridge.LauncherWindowSize = Function() New Size(GetPixelSize(FrmMain.PanForm.ActualWidth), GetPixelSize(FrmMain.PanForm.ActualHeight))
@@ -343,6 +344,173 @@ Public Module ModBase
         End If
         If PclUiBridge.MusicRefreshSetupUi Is Nothing Then
             PclUiBridge.MusicRefreshSetupUi = Sub() FrmSetupUI?.MusicRefreshUI()
+        End If
+        '—— 以下为 ModLaunch 登录与启动流程迁移新增的桥 ——
+        'ModLaunch：登录页校验（LoginData 为 Nothing 时调用当前页面实例的无参 IsVaild，否则调用对应静态页面的带参 IsVaild）
+        If PclUiBridge.LoginPageValidate Is Nothing Then
+            PclUiBridge.LoginPageValidate = Function(Type As McLoginType, LoginData As McLoginData) As String
+                Select Case Type
+                    Case McLoginType.Ms
+                        Return If(LoginData Is Nothing, FrmLoginMs.IsVaild(), PageLoginMs.IsVaild(DirectCast(LoginData, McLoginMs)))
+                    Case McLoginType.Legacy
+                        Return If(LoginData Is Nothing, FrmLoginLegacy.IsVaild(), PageLoginLegacy.IsVaild(DirectCast(LoginData, McLoginLegacy)))
+                    Case McLoginType.Nide
+                        Return If(LoginData Is Nothing, FrmLoginNide.IsVaild(), PageLoginNide.IsVaild(DirectCast(LoginData, McLoginServer)))
+                    Case McLoginType.Auth
+                        Return If(LoginData Is Nothing, FrmLoginAuth.IsVaild(), PageLoginAuth.IsVaild(DirectCast(LoginData, McLoginServer)))
+                    Case Else
+                        Return "未知的登录方式"
+                End Select
+            End Function
+        End If
+        'ModLaunch：登录页取数（按登录方式与缓存状态调用对应页面的 GetLoginData）
+        If PclUiBridge.LoginPageGetData Is Nothing Then
+            PclUiBridge.LoginPageGetData = Function(Type As McLoginType) As McLoginData
+                Select Case Type
+                    Case McLoginType.Legacy
+                        Return PageLoginLegacy.GetLoginData()
+                    Case McLoginType.Ms
+                        Return If(Settings.Get(Of String)("CacheMsV2OAuthRefresh") = "", PageLoginMs.GetLoginData(), PageLoginMsSkin.GetLoginData())
+                    Case McLoginType.Nide
+                        Return If(Settings.Get(Of String)("CacheNideAccess") = "", PageLoginNide.GetLoginData(), PageLoginNideSkin.GetLoginData())
+                    Case McLoginType.Auth
+                        Return If(Settings.Get(Of String)("CacheAuthAccess") = "", PageLoginAuth.GetLoginData(), PageLoginAuthSkin.GetLoginData())
+                    Case Else
+                        Return Nothing
+                End Select
+            End Function
+        End If
+        'ModLaunch：角色选择弹窗（将文本列表转换为 MyRadioBox 选择控件并调用 MyMsgBoxSelect，返回 0 起序号）
+        If PclUiBridge.ShowMsgBoxSelect Is Nothing Then
+            PclUiBridge.ShowMsgBoxSelect = Function(Control As Object, Title As String) As Integer
+                Dim Selections As New List(Of IMyRadio)
+                For Each Name As String In DirectCast(Control, List(Of String))
+                    Selections.Add(New MyRadioBox With {.Text = Name})
+                Next
+                Return MyMsgBoxSelect(Selections, Title)
+            End Function
+        End If
+        'ModLaunch：设备码登录弹窗（内容 JSON 反序列化后以 MyMsgBoxType.Login 入队，返回 Converter 供 C# 轮询 Result）
+        If PclUiBridge.EnqueueWaitingMsgBox Is Nothing Then
+            PclUiBridge.EnqueueWaitingMsgBox = Function(ContentJson As String, ForceWait As Boolean) As Object
+                Dim Converter As New MyMsgBoxConverter With {.Content = ContentJson.DeserializeJson(), .ForceWait = ForceWait, .Type = MyMsgBoxType.Login}
+                WaitingMyMsgBox.Enqueue(Converter)
+                Return Converter
+            End Function
+        End If
+        'ModLaunch：主题解锁（Id, 是否双倍提示）
+        If PclUiBridge.ThemeUnlock Is Nothing Then
+            PclUiBridge.ThemeUnlock = Function(Id As Integer, Hint As Boolean) ThemeUnlock(Id, Hint)
+        End If
+        'ModLaunch：启动页左侧 UI 操作
+        If PclUiBridge.LaunchLeftRefreshButtons Is Nothing Then
+            PclUiBridge.LaunchLeftRefreshButtons = Sub() FrmLaunchLeft.RefreshButtonsUI()
+        End If
+        If PclUiBridge.LaunchLeftRefreshPage Is Nothing Then
+            PclUiBridge.LaunchLeftRefreshPage = Sub(KeepInput As Boolean, Anim As Boolean) FrmLaunchLeft.RefreshPage(KeepInput, Anim)
+        End If
+        If PclUiBridge.LaunchLeftPageChangeToLogin Is Nothing Then
+            PclUiBridge.LaunchLeftPageChangeToLogin = Sub() FrmLaunchLeft.PageChangeToLogin()
+        End If
+        If PclUiBridge.LaunchLeftPageChangeToLaunching Is Nothing Then
+            PclUiBridge.LaunchLeftPageChangeToLaunching = Sub() FrmLaunchLeft.PageChangeToLaunching()
+        End If
+        If PclUiBridge.LaunchLeftLaunchingRefresh Is Nothing Then
+            PclUiBridge.LaunchLeftLaunchingRefresh = Sub() FrmLaunchLeft.LaunchingRefresh()
+        End If
+        'ModLaunch：启动日志 UI 输出
+        If PclUiBridge.AppendLaunchLog Is Nothing Then
+            PclUiBridge.AppendLaunchLog = Sub(Text As String) FrmLaunchRight.LabLog.AppendText(Text)
+        End If
+        If PclUiBridge.ClearLaunchLog Is Nothing Then
+            PclUiBridge.ClearLaunchLog = Sub() FrmLaunchRight.LabLog.Text = ""
+        End If
+        'ModLaunch：主窗体页面栈过滤、页面切换与愚人节彩蛋
+        If PclUiBridge.FilterPageStack Is Nothing Then
+            PclUiBridge.FilterPageStack = Sub() FrmMain.PageStack = FrmMain.PageStack.Where(Function(p) p.Page <> FormMain.PageType.InstanceSelect).ToList
+        End If
+        If PclUiBridge.PageChangeMain Is Nothing Then
+            PclUiBridge.PageChangeMain = Sub(Page As Integer, SubPage As Integer) FrmMain.PageChange(CType(Page, FormMain.PageType), CType(SubPage, FormMain.PageSubType))
+        End If
+        If PclUiBridge.AprilGiveup Is Nothing Then
+            PclUiBridge.AprilGiveup = Sub() If FrmMain IsNot Nothing Then FrmMain.AprilGiveup()
+        End If
+        'ModLaunch：内存优化（Full 对应 PageOtherTest.MemoryOptimize(ShowHint)）
+        If PclUiBridge.MemoryOptimizeFull Is Nothing Then
+            PclUiBridge.MemoryOptimizeFull = Sub(Full As Boolean) PageOtherTest.MemoryOptimize(Full)
+        End If
+        'ModLaunch：启动主加载器（VB 模块字段 McLaunchLoader）的状态读取与启动
+        If PclUiBridge.McLaunchLoaderStateGet Is Nothing Then
+            PclUiBridge.McLaunchLoaderStateGet = Function() McLaunchLoader.State
+        End If
+        If PclUiBridge.McLaunchLoaderStart Is Nothing Then
+            PclUiBridge.McLaunchLoaderStart = Sub(Options As McLaunchOptions) McLaunchLoader.Start(Options, IsForceRestart:=True)
+        End If
+        'ModLaunch：登录主加载器与各登录方式加载器（VB 模块字段）的桥接
+        If PclUiBridge.McLoginLoaderGet Is Nothing Then
+            PclUiBridge.McLoginLoaderGet = Function() CType(McLoginLoader, LoaderBase)
+        End If
+        If PclUiBridge.McLoginSubLoaderGet Is Nothing Then
+            PclUiBridge.McLoginSubLoaderGet = Function(Type As McLoginType) As LoaderBase
+                Select Case Type
+                    Case McLoginType.Ms
+                        Return McLoginMsLoader
+                    Case McLoginType.Legacy
+                        Return McLoginLegacyLoader
+                    Case McLoginType.Nide
+                        Return McLoginNideLoader
+                    Case McLoginType.Auth
+                        Return McLoginAuthLoader
+                    Case Else
+                        Return Nothing
+                End Select
+            End Function
+        End If
+        If PclUiBridge.McLoginLoaderInputGet Is Nothing Then
+            PclUiBridge.McLoginLoaderInputGet = Function() McLoginLoader.Input
+        End If
+        'ModLaunch：启动监视器（VB 模块字段 McLaunchWatcher）的写入
+        If PclUiBridge.McLaunchWatcherSet Is Nothing Then
+            PclUiBridge.McLaunchWatcherSet = Sub(GameWatcher As Watcher) McLaunchWatcher = GameWatcher
+        End If
+        'ModLaunch：显卡偏好设置（ModMain.SetGPUPreference）
+        If PclUiBridge.SetGpuPreference Is Nothing Then
+            PclUiBridge.SetGpuPreference = Sub(Executeable As String) SetGPUPreference(Executeable)
+        End If
+        'ModLaunch：launcher_profiles.json 的创建（ModMinecraft.McFolderLauncherProfilesJsonCreate）
+        If PclUiBridge.McFolderLauncherProfilesJsonCreate Is Nothing Then
+            PclUiBridge.McFolderLauncherProfilesJsonCreate = Sub(Folder As String) McFolderLauncherProfilesJsonCreate(Folder)
+        End If
+        'ModLaunch：版本显示名与不带时间替换的 ArgumentReplace
+        If PclUiBridge.VersionDisplayGet Is Nothing Then
+            PclUiBridge.VersionDisplayGet = Function() VersionDisplay
+        End If
+        If PclUiBridge.ArgumentReplaceNoTime Is Nothing Then
+            PclUiBridge.ArgumentReplaceNoTime = Function(Text As String) ArgumentReplace(Text, ReplaceTime:=False)
+        End If
+        'ModLaunch：启动后窗口隐藏与最小化
+        If PclUiBridge.MainHiddenSet Is Nothing Then
+            PclUiBridge.MainHiddenSet = Sub(Value As Boolean) FrmMain.Hidden = Value
+        End If
+        If PclUiBridge.MinimizeMainWindow Is Nothing Then
+            PclUiBridge.MinimizeMainWindow = Sub() FrmMain.WindowState = WindowState.Minimized
+        End If
+        'ModLaunch：带按钮动作的 MyMsgBox（Button1Action/Button2Action 不关闭弹窗）
+        If PclUiBridge.ShowMsgBoxActions Is Nothing Then
+            PclUiBridge.ShowMsgBoxActions = Function(Msg As String, Title As String, B1 As String, B2 As String, B3 As String, B1Action As Action, B2Action As Action)
+                Return MyMsgBox(Msg, Title, B1, B2, B3, Button1Action:=If(B1Action Is Nothing, Nothing, Sub() B1Action()), Button2Action:=If(B2Action Is Nothing, Nothing, Sub() B2Action()))
+            End Function
+        End If
+        'ModLaunch：密码错误时的退出登录（PageLoginAuthSkin/PageLoginNideSkin 的 ExitLogin）
+        If PclUiBridge.LoginPageExitLogin Is Nothing Then
+            PclUiBridge.LoginPageExitLogin = Sub(Type As McLoginType)
+                Select Case Type
+                    Case McLoginType.Auth
+                        RunInUi(AddressOf PageLoginAuthSkin.ExitLogin)
+                    Case McLoginType.Nide
+                        RunInUi(AddressOf PageLoginNideSkin.ExitLogin)
+                End Select
+            End Sub
         End If
         Return True
     End Function

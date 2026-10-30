@@ -169,6 +169,69 @@ public static class PclUiBridge {
     public static Action<double> UpdateMusicButtonProgress;
     /// <summary>对应 FrmSetupUI.MusicRefreshUI()。</summary>
     public static Action MusicRefreshSetupUi;
+
+    // —— 以下为 ModLaunch 登录与启动流程迁移新增的桥 ——
+
+    /// <summary>登录页校验。参数为（登录方式, 登录数据），返回错误原因（空串表示通过）。LoginData 为 null 时由 VB 调用当前页面（Frm*）的无参 IsVaild，否则调用对应静态页面（Page*）的带参 IsVaild。</summary>
+    public static Func<McLoginType, McLoginData, string> LoginPageValidate;
+    /// <summary>登录页取数。参数为登录方式，由 VB 按登录方式与缓存状态调用对应页面的 GetLoginData()。</summary>
+    public static Func<McLoginType, McLoginData> LoginPageGetData;
+    /// <summary>角色选择弹窗。参数为（选项文本列表, 标题），由 VB 构造 MyRadioBox 并调用 MyMsgBoxSelect，返回选中序号（0 起）。</summary>
+    public static Func<object, string, int> ShowMsgBoxSelect;
+    /// <summary>设备码登录弹窗。参数为（内容 JSON 字符串, 是否强制等待），由 VB 反序列化后以 MyMsgBoxType.Login 入队并返回 Converter 对象，C# 侧轮询其 Result。</summary>
+    public static Func<string, bool, object> EnqueueWaitingMsgBox;
+    /// <summary>主题解锁。参数为（主题 Id, 是否双倍提示），返回是否解锁成功。</summary>
+    public static Func<int, bool, bool> ThemeUnlock;
+    /// <summary>对应 FrmLaunchLeft.RefreshButtonsUI()。</summary>
+    public static Action LaunchLeftRefreshButtons;
+    /// <summary>对应 FrmLaunchLeft.RefreshPage(KeepInput, Anim)。</summary>
+    public static Action<bool, bool> LaunchLeftRefreshPage;
+    /// <summary>对应 FrmLaunchLeft.PageChangeToLogin()。</summary>
+    public static Action LaunchLeftPageChangeToLogin;
+    /// <summary>对应 FrmLaunchLeft.PageChangeToLaunching()。</summary>
+    public static Action LaunchLeftPageChangeToLaunching;
+    /// <summary>对应 FrmLaunchLeft.LaunchingRefresh()。</summary>
+    public static Action LaunchLeftLaunchingRefresh;
+    /// <summary>对应 FrmLaunchRight.LabLog.AppendText(Text)。</summary>
+    public static Action<string> AppendLaunchLog;
+    /// <summary>对应 FrmLaunchRight.LabLog.Text = ""。</summary>
+    public static Action ClearLaunchLog;
+    /// <summary>对应 FrmMain.PageStack 过滤（禁止进入版本选择页面）。</summary>
+    public static Action FilterPageStack;
+    /// <summary>对应 FrmMain.PageChange。参数为（页面类型, 子页面类型），由 VB 转枚举。</summary>
+    public static Action<int, int> PageChangeMain;
+    /// <summary>对应 FrmMain.AprilGiveup()。</summary>
+    public static Action AprilGiveup;
+    /// <summary>对应 PageOtherTest.MemoryOptimize(Full)。保留既有无参 MemoryOptimize 桥（PageOtherTest.MemoryOptimize(True)，ModEvent 仍在使用），另立带参版本。</summary>
+    public static Action<bool> MemoryOptimizeFull;
+    /// <summary>对应 ModLaunch.McLaunchLoader（VB 模块字段）的 State。</summary>
+    public static Func<LoadState> McLaunchLoaderStateGet;
+    /// <summary>对应 ModLaunch.McLaunchLoader.Start(Options, IsForceRestart:=True)。</summary>
+    public static Action<McLaunchOptions> McLaunchLoaderStart;
+    /// <summary>对应 ModLaunch.McLoginLoader（VB 模块字段，进度同步用）。</summary>
+    public static Func<LoaderBase> McLoginLoaderGet;
+    /// <summary>对应 ModLaunch 各登录方式的加载器（McLoginMsLoader 等），按登录方式返回。</summary>
+    public static Func<McLoginType, LoaderBase> McLoginSubLoaderGet;
+    /// <summary>对应 ModLaunch.McLoginLoader.Input（VB 模块字段）。</summary>
+    public static Func<McLoginData> McLoginLoaderInputGet;
+    /// <summary>对应 ModLaunch.McLaunchWatcher（VB 模块字段）的写入。</summary>
+    public static Action<Watcher> McLaunchWatcherSet;
+    /// <summary>对应 ModMain.SetGPUPreference(Executeable)。</summary>
+    public static Action<string> SetGpuPreference;
+    /// <summary>对应 ModMinecraft.McFolderLauncherProfilesJsonCreate(Folder)。</summary>
+    public static Action<string> McFolderLauncherProfilesJsonCreate;
+    /// <summary>对应 ModBase.VersionDisplay。</summary>
+    public static Func<string> VersionDisplayGet;
+    /// <summary>对应 ModMain.ArgumentReplace(Text, ReplaceTime:=False)。</summary>
+    public static Func<string, string> ArgumentReplaceNoTime;
+    /// <summary>对应 FrmMain.Hidden 的写入。</summary>
+    public static Action<bool> MainHiddenSet;
+    /// <summary>对应 FrmMain.WindowState = WindowState.Minimized。</summary>
+    public static Action MinimizeMainWindow;
+    /// <summary>对应带按钮动作的 MyMsgBox。参数为（内容, 标题, 按钮1, 按钮2, 按钮3, 按钮1动作, 按钮2动作），返回按钮序号；按钮动作不关闭弹窗。</summary>
+    public static Func<string, string, string, string, string, Action, Action, int> ShowMsgBoxActions;
+    /// <summary>对应密码错误时的退出登录（PageLoginAuthSkin/PageLoginNideSkin 的 ExitLogin），按登录方式分发。</summary>
+    public static Action<McLoginType> LoginPageExitLogin;
 }
 
 /// <summary>
