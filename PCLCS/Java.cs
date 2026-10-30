@@ -1,9 +1,51 @@
 namespace PCLCS;
 
 /// <summary>
+/// 兼容旧版 PCL 将 System.Version 序列化为 JSON 对象（Major/Minor/Build/Revision）的配置格式，
+/// 同时支持新版的字符串格式。写出时统一为字符串。
+/// </summary>
+public class JavaJsonConverter : JsonConverter<Java> {
+
+    public override void WriteJson(JsonWriter writer, Java? value, JsonSerializer serializer) {
+        writer.WriteStartObject();
+        writer.WritePropertyName("Folder");
+        writer.WriteValue(value!.Folder);
+        writer.WritePropertyName("Version");
+        writer.WriteValue(value.Version?.ToString());
+        writer.WriteEndObject();
+    }
+
+    public override Java? ReadJson(JsonReader reader, Type objectType, Java? existingValue, bool hasExistingValue, JsonSerializer serializer) {
+        if (reader.TokenType == JsonToken.Null) return null;
+        JObject o = JObject.Load(reader);
+        string folder = (string?)o["Folder"] ?? "";
+        Version? version = null;
+        JToken? vt = o["Version"];
+        if (vt is not null && vt.Type != JTokenType.Null) {
+            if (vt.Type == JTokenType.String) {
+                version = Version.Parse(vt.ToString());
+            } else {
+                // 旧版对象格式：{"Major":11,"Minor":0,"Build":32,"Revision":1}（Build/Revision 可能为 -1）
+                int major = (int?)vt["Major"] ?? 0;
+                int minor = (int?)vt["Minor"] ?? 0;
+                int build = (int?)vt["Build"] ?? -1;
+                int revision = (int?)vt["Revision"] ?? -1;
+                version = build < 0 ? new Version(major, minor)
+                        : revision < 0 ? new Version(major, minor, build)
+                        : new Version(major, minor, build, revision);
+            }
+        }
+        return new Java(folder, version);
+    }
+
+}
+
+/// <summary>
 /// 单个 Java 的实例。
 /// </summary>
-[Serializable] public class Java(string folder, Version? version = null) : IEquatable<Java> {
+[Serializable]
+[JsonConverter(typeof(JavaJsonConverter))]
+public class Java(string folder, Version? version = null) : IEquatable<Java> {
 
     /// <summary>
     /// java.exe 文件所在的文件夹路径，这通常是 bin 文件夹。以 \ 结尾。
