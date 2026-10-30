@@ -195,6 +195,33 @@ Public Module ModBase
         If PclUiBridge.LauncherWindowSize Is Nothing Then
             PclUiBridge.LauncherWindowSize = Function() New Size(GetPixelSize(FrmMain.PanForm.ActualWidth), GetPixelSize(FrmMain.PanForm.ActualHeight))
         End If
+        If PclUiBridge.ShowModpackMsgBox Is Nothing Then
+            PclUiBridge.ShowModpackMsgBox = Function(Msg As String, Title As String, B1 As String, B2 As String, B3 As String, Warn As Boolean, Force As Boolean) MyMsgBox(Msg, Title, If(B1, "确定"), If(B2, ""), If(B3, ""), IsWarn:=Warn, ForceWait:=Force)
+        End If
+        If PclUiBridge.ModpackInput Is Nothing Then
+            PclUiBridge.ModpackInput = Function(Title As String, Text As String, DefaultInput As String, Rules As IEnumerable(Of ValidateBase), HintText As String) MyMsgBoxInput(Title, Text, DefaultInput, New System.Collections.ObjectModel.Collection(Of ValidateBase)(If(Rules, New List(Of ValidateBase)).ToList), HintText)
+        End If
+        If PclUiBridge.LoaderTaskbarAdd Is Nothing Then
+            PclUiBridge.LoaderTaskbarAdd = Sub(Loader As Object) LoaderTaskbarAdd(DirectCast(Loader, LoaderCombo(Of String)))
+        End If
+        If PclUiBridge.EndProgram Is Nothing Then
+            PclUiBridge.EndProgram = Sub(SendWarning As Boolean) If FrmMain IsNot Nothing Then FrmMain.EndProgram(SendWarning)
+        End If
+        If PclUiBridge.DownloadExtraRibble Is Nothing Then
+            PclUiBridge.DownloadExtraRibble = Sub() If FrmMain IsNot Nothing Then FrmMain.BtnExtraDownload.Ribble()
+        End If
+        If PclUiBridge.PageSelectLeftAddFolder Is Nothing Then
+            PclUiBridge.PageSelectLeftAddFolder = Sub(FolderPath As String, DisplayName As String, ShowHint As Boolean) PageSelectLeft.AddFolder(FolderPath, DisplayName, ShowHint)
+        End If
+        If PclUiBridge.PageChangeInstanceSelect Is Nothing Then
+            PclUiBridge.PageChangeInstanceSelect = Sub() If FrmMain IsNot Nothing Then FrmMain.PageChange(FormMain.PageType.InstanceSelect)
+        End If
+        If PclUiBridge.McInstallLoadersGet Is Nothing Then
+            PclUiBridge.McInstallLoadersGet = Function(Components As McComponents, NewInstanceName As String, InstanceFolder As String) ModDownloadLib.McInstallLoadersGet(New ModDownloadLib.McInstallRequest With {.NewInstanceName = NewInstanceName, .InstanceFolder = InstanceFolder, .Components = Components})
+        End If
+        If PclUiBridge.McInstallState Is Nothing Then
+            PclUiBridge.McInstallState = Sub(Loader As LoaderBase) ModDownloadLib.McInstallState(Loader)
+        End If
         Return True
     End Function
     ''' <summary>

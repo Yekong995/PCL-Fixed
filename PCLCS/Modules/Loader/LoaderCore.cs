@@ -95,6 +95,24 @@ public static class PclUiBridge {
     public static Func<LoaderTask<McLoginServer, McLoginResult>, bool> McLoginRequestLogin;
     /// <summary>对应 FrmMain.PanForm 的实际像素尺寸（经 GetPixelSize 换算）。</summary>
     public static Func<System.Windows.Size> LauncherWindowSize;
+    /// <summary>对应 ModMain.MyMsgBox 的整合包场景弹窗。参数为（内容, 标题, 按钮1, 按钮2, 按钮3, 是否警告配色, 是否强制等待），按钮为 null 时使用 MyMsgBox 默认值（按钮1 默认 "确定"），返回按钮序号。</summary>
+    public static Func<string, string, string, string, string, bool, bool, int> ShowModpackMsgBox;
+    /// <summary>对应 ModMain.MyMsgBoxInput。参数为（标题, 文本, 默认输入, 校验规则, 提示文本），返回输入内容（Nothing 为 null）。</summary>
+    public static Func<string, string, string, IEnumerable<ValidateBase>, string, string> ModpackInput;
+    /// <summary>对应 ModLoader.LoaderTaskbarAdd(Loader)。参数为 LoaderCombo(Of String)。</summary>
+    public static Action<object> LoaderTaskbarAdd;
+    /// <summary>对应 FrmMain.EndProgram(SendWarning)。</summary>
+    public static Action<bool> EndProgram;
+    /// <summary>对应 FrmMain.BtnExtraDownload.Ribble()。</summary>
+    public static Action DownloadExtraRibble;
+    /// <summary>对应 PageSelectLeft.AddFolder(FolderPath, DisplayName, ShowHint)。</summary>
+    public static Action<string, string, bool> PageSelectLeftAddFolder;
+    /// <summary>对应 RunInUi(FrmMain.PageChange(FormMain.PageType.InstanceSelect))。</summary>
+    public static Action PageChangeInstanceSelect;
+    /// <summary>对应 ModDownloadLib.McInstallLoadersGet(Request)。参数为（组件, 新版本名, 版本文件夹）。</summary>
+    public static Func<McComponents, string, string, List<LoaderBase>> McInstallLoadersGet;
+    /// <summary>对应 ModDownloadLib.McInstallState(Loader)。</summary>
+    public static Action<LoaderBase> McInstallState;
 }
 
 /// <summary>
