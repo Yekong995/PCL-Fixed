@@ -53,6 +53,9 @@ Public Module ModBase
         If PclUiBridge.DownloadExtraRefresh Is Nothing Then
             PclUiBridge.DownloadExtraRefresh = Sub() If FrmMain IsNot Nothing Then FrmMain.BtnExtraDownload.ShowRefresh()
         End If
+        If PclUiBridge.CurrentVersionInstance Is Nothing Then
+            PclUiBridge.CurrentVersionInstance = Function() If(PageInstanceLeft.Instance Is Nothing, Nothing, PageInstanceLeft.Instance)
+        End If
         If PclNet.RawRequestProvider Is Nothing Then
             PclNet.RawRequestProvider = Function(Url As String, Method As HttpMethod, Content As Object, ContentType As String, Timeout As Integer, Encode As Encoding, RequireJson As Boolean) NetRequestByClient(Url, Method, Content, ContentType, "*/*", Timeout, Nothing, RequireJson, Encode, False, True)
         End If

@@ -15,6 +15,8 @@ namespace PCLCS.Modules;
 public static class PclUiBridge {
     /// <summary>对应 FrmMain.BtnExtraDownload.ShowRefresh()。</summary>
     public static Action DownloadExtraRefresh;
+    /// <summary>对应 PageInstanceLeft.Instance，用于版本独立设置项的读取。</summary>
+    public static Func<object> CurrentVersionInstance;
 }
 
 /// <summary>
