@@ -557,7 +557,15 @@ public class LoaderTask<TIn, TOut> : LoaderBase {
 
     // 获取输入
     public TIn StartGetInput(TIn Input = default, Func<TIn> InputDelegate = null) { // InputDelegate 参数存在匿名调用
-        if (InputDelegate is null) InputDelegate = (Func<TIn>)(object)this.InputDelegate;
+        // VB 语义：Me.InputDelegate 是 Func(Of Object) 包装（构造时由 Func(Of TIn) 协变包装而来），
+        // 不能直接转型回 Func(Of TIn)，必须再包一层运行时转换（Nothing → default）。
+        if (InputDelegate is null && this.InputDelegate is not null) {
+            Func<object> stored = this.InputDelegate;
+            InputDelegate = () => {
+                object v = stored();
+                return v is null ? default : (TIn)v;
+            };
+        }
         TIn NewInput = default; // 若 InputType 不能为 Nothing，则会导致 Input Is Nothing 永远失败，因此需要额外判断
         if ((Input == null || (NewInput != null && Input.Equals(NewInput))) && InputDelegate is not null) {
             PclCore.RunInUiWait(() => Input = InputDelegate());
