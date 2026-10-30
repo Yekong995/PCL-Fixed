@@ -31,6 +31,12 @@ public static class PclUiBridge {
     public static Action<string, string[]> Telemetry;
     /// <summary>对应 FeedbackInfo()。</summary>
     public static Action FeedbackInfo;
+    /// <summary>对应 ModMain.Feedback(ShowMsgbox, ForceOpenLog)。</summary>
+    public static Action<bool, bool> Feedback;
+    /// <summary>对应 VB MsgBox 的严重错误弹窗（MsgBoxStyle.Critical + YesNo），返回是否选择 Yes。</summary>
+    public static Func<string, bool> ShowCriticalMsgBox;
+    /// <summary>对应 FormMain.EndProgramForce(ReturnCode)。</summary>
+    public static Action<int> EndProgramForce;
     /// <summary>对应 RequestTaskTempFolder()。</summary>
     public static Func<string> RequestTaskTempFolder;
     /// <summary>对应 FilterUserName(Raw, FilterChar)。</summary>

@@ -74,6 +74,9 @@ Public Module ModBase
         End If
         If PclUiBridge.FeedbackInfo Is Nothing Then
             PclUiBridge.FeedbackInfo = Sub() FeedbackInfo()
+            PclUiBridge.Feedback = Sub(ShowMsgbox As Boolean, ForceOpenLog As Boolean) Feedback(ShowMsgbox, ForceOpenLog)
+            PclUiBridge.ShowCriticalMsgBox = Function(Text As String) MsgBox(Text, MsgBoxStyle.Critical + MsgBoxStyle.YesNo, "错误") = MsgBoxResult.Yes
+            PclUiBridge.EndProgramForce = Sub(ReturnCode As Integer) FormMain.EndProgramForce(CType(ReturnCode, ProcessReturnValues))
         End If
         If PclUiBridge.RequestTaskTempFolder Is Nothing Then
             PclUiBridge.RequestTaskTempFolder = Function() RequestTaskTempFolder()

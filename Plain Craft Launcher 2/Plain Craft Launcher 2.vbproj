@@ -207,7 +207,6 @@
       <DependentUpon>MyIconTextButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\MyVirtualizingElement.vb" />
-    <Compile Include="Modules\Base\PclLogger.vb" />
     <Compile Include="Modules\Resource\ResourceUiExtensions.vb" />
     <Compile Include="Modules\Minecraft\ModJava.vb" />
     <Compile Include="Modules\Resource\LocalResourceLoaders.vb" />
