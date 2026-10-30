@@ -107,6 +107,22 @@ Public Module ModBase
         If PclUiBridge.McDownloadClientUpdateHint Is Nothing Then
             PclUiBridge.McDownloadClientUpdateHint = Sub(Version As String, Json As JObject) McDownloadClientUpdateHint(Version, Json)
         End If
+        If PclUiBridge.McFolderSelectedGet Is Nothing Then
+            PclUiBridge.McFolderSelectedGet = Function() McFolderSelected
+        End If
+        If PclUiBridge.GetMcFoolName Is Nothing Then
+            PclUiBridge.GetMcFoolName = Function(Name As String) GetMcFoolName(Name)
+        End If
+        If PclUiBridge.ResetInstanceSettingsCache Is Nothing Then
+            PclUiBridge.ResetInstanceSettingsCache = Sub(PathVersion As String)
+                For Each Entry In Settings.Entries.Values
+                    If Entry.Source = Settings.Sources.Instance Then Entry.ValueCache.Remove(PathVersion)
+                Next
+            End Sub
+        End If
+        If PclCore.HasSavedProvider Is Nothing Then
+            PclCore.HasSavedProvider = Function(Key As String, Instance As Object) Settings.HasSaved(Key, Instance:=TryCast(Instance, McInstance))
+        End If
         Return True
     End Function
     ''' <summary>

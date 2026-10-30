@@ -86,6 +86,14 @@ public static class PclCore {
         SettingSetter(Key, Value, Instance);
     }
 
+    /// <summary>由宿主（VB UI）设置，用于判断设置项是否已保存。参数为（键，实例）。</summary>
+    public static Func<string, object, bool> HasSavedProvider;
+
+    /// <summary>判断设置项是否已保存（经由 VB Settings 实现）。</summary>
+    public static bool HasSavedSetting(string Key, object Instance = null) {
+        return HasSavedProvider(Key, Instance);
+    }
+
     #endregion
 
     #region 文件

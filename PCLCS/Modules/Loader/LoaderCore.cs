@@ -47,6 +47,12 @@ public static class PclUiBridge {
     public static Func<List<LoaderBase>> LoaderTaskbar;
     /// <summary>对应 ModMinecraft.McDownloadClientUpdateHint(Version, Json)。</summary>
     public static Action<string, Newtonsoft.Json.Linq.JObject> McDownloadClientUpdateHint;
+    /// <summary>对应 ModMinecraft.McFolderSelected（读）。</summary>
+    public static Func<string> McFolderSelectedGet;
+    /// <summary>对应 ModMinecraft.GetMcFoolName(Name)。</summary>
+    public static Func<string, string> GetMcFoolName;
+    /// <summary>对应 McInstance.ResetSettingsCache 中清理版本独立设置缓存的部分。参数为版本文件夹路径。</summary>
+    public static Action<string> ResetInstanceSettingsCache;
 }
 
 /// <summary>
