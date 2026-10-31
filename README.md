@@ -19,8 +19,8 @@
 ```powershell
 
 msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
-  -p:PclMsClientId=你的ClientID `
-  -p:PclCurseForgeApiKey=你的APIKey
+  /p:PclMsClientId=你的ClientID `
+  /p:PclCurseForgeApiKey=你的APIKey
 
 ```
 
