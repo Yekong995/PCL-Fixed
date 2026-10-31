@@ -11,6 +11,8 @@
 
 <br/>
 
+可前往 [Csharp-backend](https://github.com/Yekong995/PCL-Fixed/tree/csharp-backend) 查看重构后的 C# 版本 PCL 源代码。
+
 ### 相关资源
 - [PCL 下载](https://meloong.com/pcl)：下载可免费使用的正式版 PCL！
 - [PCL 功能投票](https://github.com/Meloong-Git/PCL/discussions/2)：来参加投票吧，开发者会优先处理票数较高的项目！
