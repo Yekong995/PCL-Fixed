@@ -24,7 +24,7 @@ msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
 
 ```
 
-方案2
+方案 2
 ```powershell
 
 $env:PCL_MS_CLIENT_ID = "你的ClientID"
