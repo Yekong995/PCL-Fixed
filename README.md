@@ -18,6 +18,7 @@
 方案 1
 ```powershell
 
+msbuild -restore
 msbuild -t:Rebuild -p:Configuration=Release -p:OutDir="../publish" -p:m=8 -p:PclMsClientId=你的ClientID -p:PclCurseForgeApiKey=你的APIKey
 
 ```
@@ -27,7 +28,8 @@ msbuild -t:Rebuild -p:Configuration=Release -p:OutDir="../publish" -p:m=8 -p:Pcl
 
 $env:PCL_MS_CLIENT_ID = "你的ClientID"
 $env:PCL_CURSEFORGE_API_KEY = "你的APIKey"
-msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
+msbuild -restore
+msbuild -t:Rebuild -p:Configuration=Release -p:OutDir="../publish" -p:m=8 `
 
 ```
 
