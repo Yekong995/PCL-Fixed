@@ -1,11 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // 密钥与安全信息入口（由 VB Modules\ModSecret.vb 迁移而来）
 //
-// 开源版默认留空，通过环境变量注入：
-//   PCL_MS_CLIENT_ID        微软正版登录 ClientID（字段 OAuthClientId）
-//   PCL_CURSEFORGE_API_KEY  CurseForge API Key（字段 CurseForgeAPIKey）
+// 注入方式（优先级从高到低）：
+//   1. 编译期注入：msbuild ... -p:PclMsClientId=xxx -p:PclCurseForgeApiKey=yyy
+//      （或设置环境变量 PCL_MS_CLIENT_ID / PCL_CURSEFORGE_API_KEY 后编译，
+//        由 PCLCS.csproj 的 GenerateEmbeddedSecrets 目标生成 EmbeddedSecrets.g.cs 写入程序集）
+//   2. 运行时环境变量：PCL_MS_CLIENT_ID / PCL_CURSEFORGE_API_KEY
 //
-// 请勿将真实密钥提交到公共仓库！
+// 开源版默认留空。请勿将真实密钥提交到公共仓库！
 // ═══════════════════════════════════════════════════════════════════════════
 #nullable disable
 
@@ -17,19 +19,23 @@ using System.Windows.Media;
 
 namespace PCLCS.Modules;
 
-public static class ModSecret {
+public static partial class ModSecret {
 
     /// <summary>
     /// 微软正版登录使用的 ClientId。
-    /// 由环境变量 PCL_MS_CLIENT_ID 注入，开源版默认留空。
+    /// 编译期注入的 EmbeddedOAuthClientId 非空时优先使用，否则回退到运行时环境变量 PCL_MS_CLIENT_ID。
     /// </summary>
-    public static string OAuthClientId = Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID") ?? "";
+    public static string OAuthClientId = string.IsNullOrEmpty(EmbeddedOAuthClientId)
+        ? Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID") ?? ""
+        : EmbeddedOAuthClientId;
 
     /// <summary>
     /// CurseForge API Key。
-    /// 由环境变量 PCL_CURSEFORGE_API_KEY 注入，开源版默认留空。
+    /// 编译期注入的 EmbeddedCurseForgeApiKey 非空时优先使用，否则回退到运行时环境变量 PCL_CURSEFORGE_API_KEY。
     /// </summary>
-    public static string CurseForgeAPIKey = Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY") ?? "";
+    public static string CurseForgeAPIKey = string.IsNullOrEmpty(EmbeddedCurseForgeApiKey)
+        ? Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY") ?? ""
+        : EmbeddedCurseForgeApiKey;
 
     // 标注 PCL 的不同分支，仅用于替换标记
     public const string VersionBranchMain = "OpenSource";

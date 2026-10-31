@@ -88,4 +88,30 @@
 	  <Reference Include="System.Xaml" />
 	</ItemGroup>
 
+	<!-- 编译期注入密钥（可选）。
+	     构建时传入：msbuild ... -p:PclMsClientId=xxx -p:PclCurseForgeApiKey=yyy
+	     或设置环境变量 PCL_MS_CLIENT_ID / PCL_CURSEFORGE_API_KEY 后构建。
+	     留空则不注入，运行时回退到环境变量（见 ModSecret.cs）。请勿提交真实密钥！ -->
+	<PropertyGroup>
+		<PclMsClientId Condition="'$(PclMsClientId)' == ''">$(PCL_MS_CLIENT_ID)</PclMsClientId>
+		<PclCurseForgeApiKey Condition="'$(PclCurseForgeApiKey)' == ''">$(PCL_CURSEFORGE_API_KEY)</PclCurseForgeApiKey>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="$(IntermediateOutputPath)EmbeddedSecrets.g.cs" />
+	</ItemGroup>
+
+	<Target Name="GenerateEmbeddedSecrets" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<_SecretLine Include="// &lt;auto-generated&gt; 由 MSBuild 生成（PclMsClientId / PclCurseForgeApiKey），请勿提交真实密钥" />
+			<_SecretLine Include="namespace PCLCS.Modules%3B" />
+			<_SecretLine Include="public static partial class ModSecret" />
+			<_SecretLine Include="{" />
+			<_SecretLine Include="    public const string EmbeddedOAuthClientId = &quot;$(PclMsClientId)&quot;%3B" />
+			<_SecretLine Include="    public const string EmbeddedCurseForgeApiKey = &quot;$(PclCurseForgeApiKey)&quot;%3B" />
+			<_SecretLine Include="}" />
+		</ItemGroup>
+		<WriteLinesToFile File="$(IntermediateOutputPath)EmbeddedSecrets.g.cs" Lines="@(_SecretLine)" Overwrite="true" />
+	</Target>
+
 </Project>
