@@ -930,7 +930,7 @@ public class CrashAnalyzer {
                     }
                     if (!FileUtils.Exists(OutputFile)) continue;
                     string FileContent = FileUtils.ReadAsString(OutputFile, FileEncoding);
-                    FileContent = PclUiBridge.FilterUserName(PclUiBridge.FilterAccessToken(FileContent, FileName == "启动脚本.bat" ? 'F' : '*'), '*');
+                    FileContent = PclMc.FilterUserName(PclMc.FilterAccessToken(FileContent, FileName == "启动脚本.bat" ? 'F' : '*'), '*');
                     FileUtils.Write(TempFolder + "Report\\" + FileName, FileContent, FileEncoding);
                     Logger.Info($"导出错误报告文件：{FileName}");
                 }

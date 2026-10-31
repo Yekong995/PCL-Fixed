@@ -1152,7 +1152,8 @@ public static class PclMc {
     /// </summary>
     public static string FilterUserName(string Raw, char FilterChar) {
         if (Raw.Contains(":\\Users\\")) {
-            Raw = System.Text.RegularExpressions.Regex.Replace(Raw, "(?<=:\\Users\\)[^\\]+", Token => new string(FilterChar, Token.Length));
+            // 正则中的 \\ 需为字面双反斜杠（正则转义的反斜杠），故 C# 字面量用四个反斜杠
+            Raw = System.Text.RegularExpressions.Regex.Replace(Raw, "(?<=:\\\\Users\\\\)[^\\\\]+", Token => new string(FilterChar, Token.Length));
         }
         if (Raw.Contains(":/Users/")) {
             Raw = System.Text.RegularExpressions.Regex.Replace(Raw, "(?<=:/Users/)[^/]+", Token => new string(FilterChar, Token.Length));

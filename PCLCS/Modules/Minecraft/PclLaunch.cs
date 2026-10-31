@@ -204,16 +204,12 @@ public static class PclLaunch {
     /// 记录启动日志。
     /// </summary>
     public static void McLaunchLog(string Text, LogLevel Level = LogLevel.Info) {
-        Dbj("McLaunchLog 进入");
-        Text = PclUiBridge.FilterUserName(PclUiBridge.FilterAccessToken(Text, '*'), '*');
-        Dbj("McLaunchLog 脱敏完成");
+        Text = PclMc.FilterUserName(PclMc.FilterAccessToken(Text, '*'), '*');
         if (PclUiBridge.ModeDebugGet()) {
             PclCore.RunInUi(
             () => PclUiBridge.AppendLaunchLog($"[{DateTime.Now:HH':'mm':'ss'.'fff'}] {Text}{Environment.NewLine}"));
         }
-        Dbj("McLaunchLog 调用 Logger.Log 前");
         Logger.Log(Text, Level);
-        Dbj("McLaunchLog 完成");
     }
 
     #endregion
@@ -524,23 +520,13 @@ public static class PclLaunch {
             Logger.Error(ex, "选择 Java 时出现异常（McLaunchJava 兜底）", LogBehavior.Toast);
             throw;
         }
-        Dbj($"McLaunchJava：SelectOrDownloadJava 返回 {(McLaunchJavaSelected is null ? "null" : McLaunchJavaSelected.ToString())}");
         if (Task.IsCanceled) return;
         if (McLaunchJavaSelected is null) throw new OperationCanceledException(); // SelectOrDownloadJava 已经会给予适当的提示
         if (PclUiBridge.ModeDebugGet()) {
             McLaunchLog($"预期 Java 版本范围：{PclJava.GetJavaRequirement(PclUiBridge.McInstanceSelectedGet()).Range}");
             McLaunchLog($"Java 版本设置类别：{PclCore.GetSetting<int>("VersionArgumentJavaV2", PclUiBridge.McInstanceSelectedGet())}");
         }
-        Dbj("McLaunchJava：调用 McLaunchLog 前");
         McLaunchLog("选择的 Java：" + McLaunchJavaSelected.ToString());
-        Dbj("McLaunchJava：调用 McLaunchLog 后");
-    }
-
-    private static void Dbj(string message) {
-        try {
-            System.IO.File.AppendAllText(Paths.Base + "dbg_java.txt", $"{DateTime.Now:HH:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId}] {message}\r\n");
-        } catch {
-        }
     }
 
     #endregion
@@ -1134,7 +1120,7 @@ public static class PclLaunch {
                 "pause";
             FileUtils.Write(
                 filePath: CurrentLaunchOptions.SaveBatch ?? (Paths.Base + "PCL\\LatestLaunch.bat"),
-                text: PclUiBridge.FilterAccessToken(CmdString, 'F').Replace("%", "%%"),
+                text: PclMc.FilterAccessToken(CmdString, 'F').Replace("%", "%%"),
                 encoding: McLaunchEncoding);
             if (CurrentLaunchOptions.SaveBatch is not null) {
                 McLaunchLog("导出启动脚本完成，强制结束启动过程");

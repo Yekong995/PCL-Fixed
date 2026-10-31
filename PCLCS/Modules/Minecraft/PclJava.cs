@@ -371,22 +371,9 @@ public static class PclJava {
                     // 搜索 Java
                     Func<Java> SelectJavaFromJavaList =
                     () => {
-                        Dbg("进入 SelectJavaFromJavaList");
                         JavaListRefreshWorker.WaitIfRunning(); // 等待进行中的搜索结束
-                        Dbg("WaitIfRunning 完成");
-                        ConcurrentList<Java> JavaList = Configs.JavaList.Get();
-                        Dbg($"JavaList 读取成功，共 {JavaList?.Count ?? 0} 个");
-                        foreach (Java ChosenJava in JavaList) {
-                            Dbg($"检查 Java：{ChosenJava.Folder}");
-                            bool ok;
-                            try {
-                                ok = ChosenJava.CheckAsync(c).Run(); // 检查
-                            } catch (Exception ex) {
-                                Dbg($"CheckAsync 抛出异常：{ex.GetType().Name}: {ex.Message}");
-                                throw;
-                            }
-                            Dbg($"CheckAsync 结果：{ok}，版本：{ChosenJava.Version}");
-                            if (!ok) {
+                        foreach (Java ChosenJava in Configs.JavaList.Get()) {
+                            if (!ChosenJava.CheckAsync(c).Run()) { // 检查
                                 Logger.Warn($"Java 检查失败，将尝试列表中的下一个 Java：{ChosenJava}");
                                 continue;
                             }
@@ -394,14 +381,10 @@ public static class PclJava {
                             Logger.Info($"已选定 Java：{ChosenJava}");
                             return ChosenJava;
                         }
-                        Dbg("SelectJavaFromJavaList 返回 null");
                         return null;
                     };
-                    Dbg("调用 p?.Set(0.25) 前");
                     p?.Set(0.25);
-                    Dbg("调用 p?.Set(0.25) 后");
                     Java Result = SelectJavaFromJavaList();
-                    Dbg($"SelectJavaFromJavaList 完成，Result={(Result is null ? "null" : Result.ToString())}");
                     if (Result is not null) { p?.Skip(); return Result; }
 
                     lock (JavaLock) { // #3797
@@ -475,7 +458,6 @@ public static class PclJava {
                     }
             }
         } catch (Exception ex) {
-            Dbg($"SelectOrDownloadJava catch：{ex.GetType().Name}: {ex.Message}");
             try {
                 System.IO.File.WriteAllText(Paths.Base + "java_error.txt", ex.ToString()); // 兜底落盘（与 Log1.txt 同目录），绕过日志系统
             } catch {
@@ -486,14 +468,6 @@ public static class PclJava {
         }
     }
     private static readonly object JavaLock = new object();
-
-    // 调试探针：绕过日志系统直接落盘，用于定位日志链中断的异常
-    private static void Dbg(string message) {
-        try {
-            System.IO.File.AppendAllText(Paths.Base + "dbg_java.txt", $"{DateTime.Now:HH:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId}] {message}\r\n");
-        } catch {
-        }
-    }
 
     // 由 SelectOrDownloadJava 中的 Static 局部变量迁移而来（VB Static 在所有调用间共享）。
     private static readonly RedoableWorker<List<JavaDownloadInfo>> DownloadListWorker = new RedoableWorker<List<JavaDownloadInfo>>(
