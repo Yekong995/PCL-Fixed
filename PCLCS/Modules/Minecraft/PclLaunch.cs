@@ -509,17 +509,7 @@ public static class PclLaunch {
     #region Java 处理
 
     public static void McLaunchJava(LoaderTask<int, int> Task) {
-        try {
-            McLaunchJavaSelected = PclJava.SelectOrDownloadJava(PclUiBridge.McInstanceSelectedGet(), true, Task.CreateCancellationToken(), Task.CreateSyncProgressProvider());
-        } catch (Exception ex) {
-            // 兜底：确保真实异常始终落盘（绕过日志系统，避免日志链自身异常导致堆栈丢失）
-            try {
-                System.IO.File.WriteAllText(Paths.Base + "java_error.txt", ex.ToString());
-            } catch {
-            }
-            Logger.Error(ex, "选择 Java 时出现异常（McLaunchJava 兜底）", LogBehavior.Toast);
-            throw;
-        }
+        McLaunchJavaSelected = PclJava.SelectOrDownloadJava(PclUiBridge.McInstanceSelectedGet(), true, Task.CreateCancellationToken(), Task.CreateSyncProgressProvider());
         if (Task.IsCanceled) return;
         if (McLaunchJavaSelected is null) throw new OperationCanceledException(); // SelectOrDownloadJava 已经会给予适当的提示
         if (PclUiBridge.ModeDebugGet()) {

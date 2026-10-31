@@ -458,12 +458,8 @@ public static class PclJava {
                     }
             }
         } catch (Exception ex) {
-            try {
-                System.IO.File.WriteAllText(Paths.Base + "java_error.txt", ex.ToString()); // 兜底落盘（与 Log1.txt 同目录），绕过日志系统
-            } catch {
-            }
             ex.ThrowIfCanceled();
-            Logger.Error(ex, "选择 Java 时出现异常", LogBehavior.Toast);
+            Logger.Error(ex, "选择 Java 时出现异常");
             p?.Skip(); return null;
         }
     }
