@@ -11,6 +11,8 @@
 
 <br/>
 
+这里将绝大部分核心代码迁移至 PCLCS 下，并且在 PCLCS 中使用了 C# 语言进行重写。
+
 ### 相关资源
 - [PCL 下载](https://meloong.com/pcl)：下载可免费使用的正式版 PCL！
 - [PCL 功能投票](https://github.com/Meloong-Git/PCL/discussions/2)：来参加投票吧，开发者会优先处理票数较高的项目！
