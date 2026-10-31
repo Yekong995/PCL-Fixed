@@ -13,6 +13,26 @@
 
 这里将绝大部分核心代码迁移至 PCLCS 下，并且在 PCLCS 中使用了 C# 语言进行重写。
 
+# 编译方式
+
+方案 1
+```powershell
+
+msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
+  -p:PclMsClientId=你的ClientID `
+  -p:PclCurseForgeApiKey=你的APIKey
+
+```
+
+方案2
+```powershell
+
+$env:PCL_MS_CLIENT_ID = "你的ClientID"
+$env:PCL_CURSEFORGE_API_KEY = "你的APIKey"
+msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
+
+```
+
 ### 相关资源
 - [PCL 下载](https://meloong.com/pcl)：下载可免费使用的正式版 PCL！
 - [PCL 功能投票](https://github.com/Meloong-Git/PCL/discussions/2)：来参加投票吧，开发者会优先处理票数较高的项目！
