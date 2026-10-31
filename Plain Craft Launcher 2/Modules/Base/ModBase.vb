@@ -515,6 +515,34 @@ Public Module ModBase
                 End Select
             End Sub
         End If
+        'LocalResourceLoaders：Mod 页面加载器与列表 UI 依赖
+        If PclUiBridge.ModPageLoadShowProgress Is Nothing Then
+            PclUiBridge.ModPageLoadShowProgress = Sub(Show As Boolean) If FrmInstanceMod IsNot Nothing Then FrmInstanceMod.Load.ShowProgress = Show
+        End If
+        If PclUiBridge.ModPageLoadText Is Nothing Then
+            PclUiBridge.ModPageLoadText = Sub(Text As String) If FrmInstanceMod IsNot Nothing Then FrmInstanceMod.Load.Text = Text
+        End If
+        If PclUiBridge.ModPageLoaderRun Is Nothing Then
+            PclUiBridge.ModPageLoaderRun = Sub(Type As LoaderFolderRunType) If FrmInstanceMod IsNot Nothing Then FrmInstanceMod.LoaderRun(Type)
+        End If
+        If PclUiBridge.ModPageUpdatingFolderContains Is Nothing Then
+            PclUiBridge.ModPageUpdatingFolderContains = Function(Folder As String) PageInstanceMod.UpdatingInstanceModFolders.Contains(Folder)
+        End If
+        If PclUiBridge.ModPageInstanceGet Is Nothing Then
+            PclUiBridge.ModPageInstanceGet = Function() PageInstanceLeft.Instance
+        End If
+        If PclUiBridge.ModPageFilterGet Is Nothing Then
+            PclUiBridge.ModPageFilterGet = Function() If(FrmInstanceMod Is Nothing, 0, CInt(FrmInstanceMod.Filter))
+        End If
+        If PclUiBridge.ModPageFilterSet Is Nothing Then
+            PclUiBridge.ModPageFilterSet = Sub(Filter As Integer) If FrmInstanceMod IsNot Nothing Then FrmInstanceMod.Filter = CType(Filter, PageInstanceMod.FilterType)
+        End If
+        If PclUiBridge.ModPageRefreshUI Is Nothing Then
+            PclUiBridge.ModPageRefreshUI = Sub() FrmInstanceMod?.RefreshUI()
+        End If
+        If PclUiBridge.ModPageRefreshBars Is Nothing Then
+            PclUiBridge.ModPageRefreshBars = Sub() FrmInstanceMod?.RefreshBars()
+        End If
         Return True
     End Function
     ''' <summary>

@@ -239,6 +239,27 @@ public static class PclUiBridge {
     public static Func<string, string, string, string, string, Action, Action, int> ShowMsgBoxActions;
     /// <summary>对应密码错误时的退出登录（PageLoginAuthSkin/PageLoginNideSkin 的 ExitLogin），按登录方式分发。</summary>
     public static Action<McLoginType> LoginPageExitLogin;
+
+    // —— 以下为 LocalResourceLoaders 迁移新增的桥 ——
+
+    /// <summary>对应 FrmInstanceMod.Load.ShowProgress（写）。</summary>
+    public static Action<bool> ModPageLoadShowProgress;
+    /// <summary>对应 FrmInstanceMod.Load.Text（写）。</summary>
+    public static Action<string> ModPageLoadText;
+    /// <summary>对应 FrmInstanceMod.LoaderRun(Type)。</summary>
+    public static Action<LoaderFolderRunType> ModPageLoaderRun;
+    /// <summary>对应 PageInstanceMod.UpdatingInstanceModFolders.Contains(Folder)。</summary>
+    public static Func<string, bool> ModPageUpdatingFolderContains;
+    /// <summary>对应 PageInstanceLeft.Instance（读）。</summary>
+    public static Func<McInstance> ModPageInstanceGet;
+    /// <summary>对应 FrmInstanceMod.Filter（读），FrmInstanceMod 为 Nothing 时返回 0。</summary>
+    public static Func<int> ModPageFilterGet;
+    /// <summary>对应 FrmInstanceMod.Filter（写）。</summary>
+    public static Action<int> ModPageFilterSet;
+    /// <summary>对应 FrmInstanceMod.RefreshUI()。</summary>
+    public static Action ModPageRefreshUI;
+    /// <summary>对应 FrmInstanceMod.RefreshBars()。</summary>
+    public static Action ModPageRefreshBars;
 }
 
 /// <summary>
