@@ -4,7 +4,9 @@
 		<TargetFramework>net48</TargetFramework>
 		<OutputType>Library</OutputType>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<OutDir>bin\</OutDir>
+		<!-- 输出按配置隔离：Debug 与 Release 不能共用 PCLCS\bin\，否则后构建的配置会覆盖另一个，
+		     导致 VB 工程从 PCLCS\bin\ 嵌入的 DLL（含编译期注入的密钥）与实际配置不一致。 -->
+		<OutDir>bin\$(Configuration)\</OutDir>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		<Configurations>Debug;Release;Snapshot</Configurations>
@@ -118,6 +120,16 @@
 			<_SecretLine Include="}" />
 		</ItemGroup>
 		<WriteLinesToFile File="$(IntermediateOutputPath)EmbeddedSecrets.g.cs" Lines="@(_SecretLine)" Overwrite="true" />
+	</Target>
+
+	<!-- VB 工程的 Resources.resx 固定从 PCLCS\bin\ 嵌入 PCLCS.dll / MeloongCore*.dll / Microsoft.Win32.Registry.dll。
+	     由于输出已按配置隔离到 bin\$(Configuration)\，这里在构建后把当前配置的产物复制回固定路径，
+	     保证 VB 工程嵌入的始终是当前配置（含正确注入密钥）的 DLL。 -->
+	<Target Name="RefreshEmbeddedDllPath" AfterTargets="Build">
+		<ItemGroup>
+			<_EmbedDll Include="$(OutDir)*.dll" />
+		</ItemGroup>
+		<Copy SourceFiles="@(_EmbedDll)" DestinationFolder="$(MSBuildProjectDirectory)\bin" SkipUnchangedFiles="false" />
 	</Target>
 
 </Project>
