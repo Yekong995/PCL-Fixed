@@ -101,7 +101,13 @@
 		<Compile Include="$(IntermediateOutputPath)EmbeddedSecrets.g.cs" />
 	</ItemGroup>
 
-	<Target Name="GenerateEmbeddedSecrets" BeforeTargets="CoreCompile">
+	<!-- 把生成目标挂到 CoreCompile 的依赖链上，确保它在编译增量检查（Inputs/Outputs 比较）之前运行，
+	     否则改变 PclMsClientId 后，第一次构建会因检查时 .g.cs 仍是旧值而跳过编译。 -->
+	<PropertyGroup>
+		<CoreCompileDependsOn>GenerateEmbeddedSecrets;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+	</PropertyGroup>
+
+	<Target Name="GenerateEmbeddedSecrets">
 		<ItemGroup>
 			<_SecretLine Include="// &lt;auto-generated&gt; 由 MSBuild 生成（PclMsClientId / PclCurseForgeApiKey），请勿提交真实密钥" />
 			<_SecretLine Include="namespace PCLCS.Modules%3B" />
