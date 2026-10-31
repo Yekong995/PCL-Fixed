@@ -338,7 +338,7 @@ public static class PclLaunchUi {
 
         string Result;
         try {
-            Result = NetCore.NetRequestByClientMultiple("https://login.live.com/oauth20_token.srf", HttpMethod.Post,
+            Result = NetCore.NetRequestByClientMultiple("https://login.live.com/oauth20_desktop.srf", HttpMethod.Post,
                 Content: $"client_id={ModSecret.OAuthClientId}&refresh_token={StringUtils.FormUrlEscape(Code)}&grant_type=refresh_token&scope=XboxLive.signin%20offline_access",
                 ContentType: "application/x-www-form-urlencoded",
                 Headers: new[,] { { "Accept-Language", "en-US,en;q=0.5" }, { "X-Requested-With", "XMLHttpRequest" } },
