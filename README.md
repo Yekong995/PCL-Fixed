@@ -18,9 +18,9 @@
 方案 1
 ```powershell
 
-msbuild /t:Rebuild /p:Configuration=Release /p:OutDir="../publish" /p:m=8 `
-  /p:PclMsClientId=你的ClientID `
-  /p:PclCurseForgeApiKey=你的APIKey
+msbuild -p:Configuration=Release -p:OutDir="../publish" -p:m=8 `
+  -p:PclMsClientId=你的ClientID `
+  -p:PclCurseForgeApiKey=你的APIKey
 
 ```
 
