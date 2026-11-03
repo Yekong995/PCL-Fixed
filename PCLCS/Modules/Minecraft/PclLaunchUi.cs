@@ -332,21 +332,29 @@ public static class PclLaunchUi {
             }
         }
     }
-    // 微软登录步骤 1，刷新登录：从 OAuth Code 或 OAuth RefreshToken 获取 {OAuth AccessToken, OAuth RefreshToken}
+    // 微软登录步骤 1，刷新登录：用 RefreshToken 换取 {OAuth AccessToken, OAuth RefreshToken}
+    // 刷新端点必须与签发 RefreshToken 的端点一致（设备码登录走 login.microsoftonline.com/consumers/oauth2/v2.0）。
+    // 旧的 Live Connect 端点 login.live.com/oauth20_desktop.srf 已被微软停用：它只会返回一页
+    // "You have reached a page that is not normally shown" 的 HTML，反序列化必然失败（Log1.txt 中重新登录报错即由此而来）。
     private static (string OAuthAccessToken, string OAuthRefreshToken) MsLoginStep1Refresh(string Code) {
         PclLaunch.McLaunchLog("开始微软登录步骤 1/6（刷新登录）");
 
         string Result;
         try {
-            Result = NetCore.NetRequestByClientMultiple("https://login.live.com/oauth20_desktop.srf", HttpMethod.Post,
+            Result = NetCore.NetRequestByClientMultiple("https://login.microsoftonline.com/consumers/oauth2/v2.0/token", HttpMethod.Post,
                 Content: $"client_id={ModSecret.OAuthClientId}&refresh_token={StringUtils.FormUrlEscape(Code)}&grant_type=refresh_token&scope=XboxLive.signin%20offline_access",
                 ContentType: "application/x-www-form-urlencoded",
                 Headers: new[,] { { "Accept-Language", "en-US,en;q=0.5" }, { "X-Requested-With", "XMLHttpRequest" } },
+                RequireJson: true,
                 ThreadCount: 2);
         } catch (HttpRequestCodeException ex) {
             // 修改错误列表时，同时检查 MyMsgLogin.xaml.vb 中的对应代码
-            string Response = ex.Response;
-            if (Response.ContainsIgnoreCase("must sign in again") || Response.ContainsIgnoreCase("password expired") ||
+            string Response = ex.Response ?? "";
+            // v2.0 端点按 OAuth 标准返回 HTTP 400 + JSON 错误：invalid_grant、AADSTS70008（授权已过期）、
+            // AADSTS700082（RefreshToken 长期未使用而失效）、AADSTS50173（授权被撤销）等，都要求重新网页登录
+            if (Response.Contains("invalid_grant") ||
+               Response.Contains("AADSTS70008") || Response.Contains("AADSTS50173") ||
+               Response.ContainsIgnoreCase("must sign in again") || Response.ContainsIgnoreCase("password expired") ||
                (Response.Contains("refresh_token") && Response.ContainsIgnoreCase("is not valid")) || // #269
                Response.ContainsIgnoreCase("expired")) { // #8611
                 return ("Relogin", "");
@@ -359,11 +367,18 @@ public static class PclLaunchUi {
             } else {
                 throw;
             }
+        } catch (FormatException) {
+            // 端点返回了非 JSON（例如代理或微软返回的 HTML 页面），无法自愈，退回网页登录
+            PclLaunch.McLaunchLog("微软登录刷新端点返回了非 JSON 内容，转为重新登录");
+            return ("Relogin", "");
         }
 
         JObject ResultJson = (JObject)Result.DeserializeJson();
+        if (ResultJson["access_token"] is null) return ("Relogin", ""); // 端点直接返回了 error 对象
         string AccessToken = ResultJson["access_token"].ToString();
-        string RefreshToken = ResultJson["refresh_token"].ToString();
+        // v2.0 端点会轮换 RefreshToken；万一没返回就沿用原来的（旧 Token 仍然有效）
+        string RefreshToken = ResultJson["refresh_token"]?.ToString();
+        if (string.IsNullOrEmpty(RefreshToken)) RefreshToken = Code;
         return (AccessToken, RefreshToken);
     }
     // 微软登录步骤 3：从 XBLToken 获取 {XSTSToken, UHS}
