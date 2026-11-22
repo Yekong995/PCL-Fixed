@@ -1088,6 +1088,11 @@ Public Module ModBase
     ''' 注意：性能较差，不应大量使用。
     ''' </summary>
     Public Function GetObjectFromXML(Str As String) As Object
+        '兼容程序集改名：程序集已重命名为 “Plain Craft Launcher 2-Fixed”，
+        '但内置 XAML 与自定义内容中仍可能硬编码上游程序集名，导致 XamlReader 无法解析 PCL 类型，这里统一替换为当前程序集名
+        Dim SelfAssemblyName As String = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name
+        Str = Str.Replace("assembly=Plain Craft Launcher 2""", "assembly=" & SelfAssemblyName & """").
+                  Replace("assembly=Plain Craft Launcher 2'", "assembly=" & SelfAssemblyName & "'")
         Str = Str. '兼容旧版自定义事件写法
             Replace("EventType=""", "local:CustomEventService.EventType=""").
             Replace("EventData=""", "local:CustomEventService.EventData=""").
