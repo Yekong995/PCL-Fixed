@@ -298,7 +298,7 @@ public static class PclModpack {
                     if (ModJson["modules"].Any()) { // modules 可能返回 null（#1006）
                         List<string> ModuleNames = ((JArray)ModJson["modules"]).Select(l => l["name"].ToString()).ToList();
                         if (ModuleNames.Contains("META-INF") || ModuleNames.Contains("mcmod.info") || ModuleNames.Contains("fabric.mod.json") ||
-                            (ModJson?["FileName"]?.ToString() ?? "").EndsWithF(".jar", true)) {
+                            (ModJson?["fileName"]?.ToString() ?? "").EndsWithF(".jar", true)) {
                             TargetFolder = "mods"; Type = ResourceTypes.Mod;
                         } else if (ModuleNames.Contains("pack.mcmeta")) {
                             TargetFolder = "resourcepacks"; Type = ResourceTypes.ResourcePack;
