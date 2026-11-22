@@ -297,8 +297,14 @@ public static class PclMc {
 
         #region 循环加载每个版本的信息
         foreach (DirectoryInfo VersionFolderInfo in DirectoryUtils.GetInfo(Folder + "versions").GetDirectories()) {
-            if (!VersionFolderInfo.Exists || !VersionFolderInfo.EnumerateFiles().Any()) {
-                Logger.Info($"跳过空文件夹：{VersionFolderInfo.FullName}");
+            try {
+                if (!VersionFolderInfo.Exists || !VersionFolderInfo.EnumerateFiles().Any()) {
+                    Logger.Info($"跳过空文件夹：{VersionFolderInfo.FullName}");
+                    continue;
+                }
+            } catch (DirectoryNotFoundException) {
+                // #9499
+                Logger.Info($"跳过已被移除的实例文件夹：{VersionFolderInfo.FullName}");
                 continue;
             }
             if ((VersionFolderInfo.Name == "cache" || VersionFolderInfo.Name == "BLClient" || VersionFolderInfo.Name == "PCL") &&
