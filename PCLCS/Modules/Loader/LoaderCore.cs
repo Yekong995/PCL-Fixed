@@ -608,6 +608,10 @@ public class LoaderTask<TIn, TOut> : LoaderBase, ILoaderTaskRestartable {
         // 获取输入
         try {
             Input = StartGetInput(Input);
+        } catch (Exception ex) when (ex.IsCanceled()) {
+            // 线程因获取输入期间加载器被重启而中断，此时输入无效，直接忽略，不应视为加载失败
+            Logger.Trace(ex, $"加载输入获取因取消而中断（{Name}）");
+            return true;
         } catch (Exception ex) {
             Logger.Error(ex, $"加载输入获取失败（{Name}）", LogBehavior.Toast);
             Error = ex;
