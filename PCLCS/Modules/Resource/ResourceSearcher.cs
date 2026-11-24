@@ -386,15 +386,6 @@ public class ResourceSearcher {
                                     !Project.UnsafeGameVersions.Any(d => d == Request.GameVersion)) continue;
                                 ProjectList.Add(Project);
                             }
-                            if (ProjectList.Any() && Request.ModLoaders != ModLoaders.None && !IgnoreModLoaderFilter &&
-                                !string.IsNullOrEmpty(Request.GameVersion)) {
-                                string ProjectIds = ProjectList.Select(p => p.Id).Join("\",\"project_id:");
-                                string Loaders = Request.ModLoaders.Flags().Select(f => f.ToString().Lower()).Join("\",\"categories:");
-                                string FilterUrl = $"https://api.modrinth.com/v2/search?limit={ProjectList.Count}&facets=" +
-                                    $"[[\"project_id:{ProjectIds}\"],[\"categories:{Loaders}\"],[\"versions:{Request.GameVersion}\"]]";
-                                List<string> MatchedIds = PclNet.DlModRequest(FilterUrl)["hits"].Select(h => h["project_id"].ToString()).ToList();
-                                ProjectList.KeepIf(p => MatchedIds.Contains(p.Id));
-                            }
                             // 更新结果
                             ProjectList.ForEach(p => SearchResults.Add(p));
                             Logger.Info($"从 Modrinth 直接获取到了 {ProjectList.Count} 个工程");
@@ -413,6 +404,9 @@ public class ResourceSearcher {
                     if (Task.IsCanceled) return; // 会自动触发 Finally 以清理线程
                 }
                 RawResults = new List<ResourceProject>(SearchResults);
+
+                ResourceProject.ApplyLoadersOfVersion(RawResults, Request.GameVersion);
+                if (Task.IsCanceled) return;
 
                 // 仅保留兼容 Forge 的 Mod，或老版本中没有标注任何 Mod Loader 的 Mod
                 if (IgnoreModLoaderFilter) {

@@ -87,6 +87,14 @@ public class ResourceProject {
     /// 若非从 Modrinth 获取则为 Nothing。
     /// </summary>
     public List<string> UnsafeGameVersions { get; }
+    /// <summary>
+    /// 指定 MC 版本实际支持的 Mod 加载器。仅用于展示，不会被缓存。
+    /// </summary>
+    public ModLoaders LoadersOfVersion = ModLoaders.None;
+    /// <summary>
+    /// 各 MC 版本实际支持的 Mod 加载器，仅 CurseForge 有效。
+    /// </summary>
+    private readonly Dictionary<string, ModLoaders> LoadersPerVersion = new Dictionary<string, ModLoaders>();
 
     // 数据库信息
 
@@ -201,6 +209,12 @@ public class ResourceProject {
                 foreach (JToken File in Data["latestFilesIndexes"] ?? new JArray()) { // 这俩玩意儿包含的文件不一样，见 #3599
                     if (!McVersion.IsStandardFormat(File["gameVersion"]?.ToString())) continue;
                     Files.Add(new KeyValuePair<int, List<string>>(File["fileId"].ToObject<int>(), new List<string> { File["gameVersion"].ToString() }));
+                    // 部分早期上传的文件没有标注加载器
+                    if (File["modLoader"] is not null) {
+                        string FileVersion = File["gameVersion"].ToString();
+                        LoadersPerVersion[FileVersion] = LoadersPerVersion.GetOrDefault(FileVersion) |
+                            Resource.FromCurseForgeModLoaderType(File["modLoader"].ToObject<int>());
+                    }
                 }
                 CurseForgeFileIds = Files.Select(f => f.Key).Distinct().ToList();
                 Drops = Files.SelectMany(f => f.Value).
@@ -544,6 +558,39 @@ public class ResourceProject {
             }
         }
         return (Title, Subtitle);
+    }
+
+    /// <summary>
+    /// 为工程列表应用指定 MC 版本实际支持的 Mod 加载器，仅用于展示。
+    /// </summary>
+    public static void ApplyLoadersOfVersion(IEnumerable<ResourceProject> Projects, string GameVersion) {
+        if (string.IsNullOrEmpty(GameVersion)) return;
+        foreach (ResourceProject Project in Projects) {
+            if (Project.Platform == ResourcePlatforms.CurseForge) Project.LoadersOfVersion = Project.GetCurseForgeLoadersForVersion(GameVersion);
+        }
+        List<ResourceProject> ModrinthProjects = Projects.Where(p => p.Platform == ResourcePlatforms.Modrinth).ToList();
+        if (!ModrinthProjects.Any()) return;
+        try {
+            JArray Versions = (JArray)PclNet.DlModRequest($"https://api.modrinth.com/v2/versions?project_ids=[\"{ModrinthProjects.Select(p => p.Id).Join("\",\"")}\"]&game_versions=[\"{GameVersion}\"]&include_changelog=false");
+            foreach (JObject Version in Versions) {
+                ResourceProject Project = ModrinthProjects.FirstOrDefault(p => p.Id == Version["project_id"].ToString());
+                if (Project is null) continue;
+                foreach (JToken RawLoader in Version["loaders"]) {
+                    foreach (ModLoaders Loader in EnumUtils.GetAllFlags<ModLoaders>()) {
+                        if (RawLoader.ToString().Lower() == Loader.ToString().Lower()) Project.LoadersOfVersion |= Loader;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Logger.Warn(ex, $"获取工程在 {GameVersion} 下支持的加载器失败");
+        }
+        foreach (ResourceProject Project in ModrinthProjects) { // 没有标注加载器时，退回未筛选的加载器
+            if (Project.LoadersOfVersion == ModLoaders.None) Project.LoadersOfVersion = Project.ModLoaders;
+        }
+    }
+    private ModLoaders GetCurseForgeLoadersForVersion(string GameVersion) {
+        ModLoaders Result = LoadersPerVersion.GetOrDefault(GameVersion);
+        return Result == ModLoaders.None ? this.ModLoaders : Result;
     }
 
     /// <summary>
