@@ -58,7 +58,7 @@ Public Module ResourceUiExtensions
         End If
         '获取 Mod 加载器描述
         Dim ModLoaderDescriptionFull As String, ModLoaderDescriptionPart As String
-        Dim ModLoadersForDesc = Project.ModLoaders.Flags().ToList()
+        Dim ModLoadersForDesc = Project.LoadersOfVersion.Flags().ToList()
         Select Case ModLoadersForDesc.Count
             Case 0
                 If ModLoadersForDesc.IsSingle Then
